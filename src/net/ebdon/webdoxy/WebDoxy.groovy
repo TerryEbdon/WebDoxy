@@ -1,0 +1,211 @@
+/**
+@author Terry Ebdon
+
+@brief Groovy script to build web-sites using Doxygen for static generation.
+
+@todo
+<ul>
+ <li> Use per-site configuration files.
+ <li> Eliminate dot.cmd via a Doxyfile configuration?
+ <li> Delete temp Doxygen cfg file when build fails. i.e. catch the exception & delete.
+ <li> Only check for Perl if citations are used.
+ <li> Move the perl command and version string into the configuration file.
+ <li> Only check for latex if latex output is required.
+ <li> Move the latex command and version string into the configuration file.
+ <li> Only check for Dot if Dot output is required.
+ <li> Move the Dot command and version string into the configuration file.
+</ul>
+
+@todo Move all string constants into config.groovy
+@todo Move all message strings into Language.properties
+@todo Run the Latex make.cmd fie, if present
+ - check for Latex build errors.
+ - check that refman.pdf has been created
+@todo Is there a way to specify the name of the generated PDF?
+If not then add code to rename the PDF after it's been created.
+@note The build depends on dot.cmd, which is a wrapper script to run
+the dot executable . This allows dot to be used, by Doxygen,
+without being on the Windows path.
+
+## Overview
+At run-time the script will:
+1. Scan all input folders, checking files for obvious errors that may not be spotted by Doxygen
+2. Generate documentation for each configuration
+
+## Process
+
+For each configured site (live, staged, draft...)
+ - create a config file
+ - Add the config specific input folders
+ - Add the config name as an enabled section
+ - Change the output folder name to be configuration specific
+ - delete output of the last run
+ - Generate documentation via doxygen
+
+ */
+
+package net.ebdon.webdoxy;
+
+class WebDoxy {
+	static final defaultConfigs = [ 'live', 'staged' ]
+	def projects = [] // aa / !  < List of projects that the commansd(s) will apply to
+	Boolean doxygenInitialised = false
+	def buildConfig
+	AntBuilder ant = new AntBuilder()
+
+	public static main( args ) {
+		def cli = new CliBuilder(usage: 'Build -[bcgh] [project-name]*')
+
+		cli.with {
+			h longOpt: 'help', 'Show usage information'
+			c longOpt: 'create', 'Create configuration file and source folders for project(s)'
+			g longOpt: 'generate', 'Generate web site(s) for project(s)'
+			b longOpt: 'backup', 'Backup configuration & source files for all projects'
+			v longOpt: 'validate', 'Run a validation check on the specified projects'
+			t longOpt: 'toc', 'Create a table of contents page, referencing all configured projects'
+			d longOpt: 'day', 'Create a daily diary entry'
+		}
+
+		def options = cli.parse(args)
+		if (options) {
+			WebDoxy build = new WebDoxy( options.arguments() )
+			if ( options.c ) {
+				build.create()
+			}
+			if ( options.d ) {
+				build.addDiaryPage()
+			}
+			if ( options.g ) {
+				build.generate()
+			}
+			if ( options.t ) {
+				build.createToc()
+			}
+			if ( options.b ) {
+				new Backup().run()
+			}
+		}
+	}
+
+	WebDoxy( cliArgs ) {
+		checkInstall()
+		buildConfig = new ConfigSlurper().parse( new File( 'config.groovy' ).toURI().toURL())
+		projects = cliArgs ?: buildConfig.defaultProjects
+		initDoxygen()
+	}
+
+	void checkInstall() {
+		assert "perl --version".execute().text.contains('This is perl 5')
+		assert "latex --version".execute().text.contains('pdfTeX')
+		final String dotProperty = System.env['GRAPHVIZ_DOT']
+		assert dotProperty
+		// assert dotProperty.length() > 5
+		assert new File(dotProperty).exists()
+		assert "dot -?".execute().text.contains('Usage: dot')
+	}
+
+	void addDiaryPage() {
+		projects.each { projectName ->
+			new JournalProject( projectName, buildConfig ).with {
+				createPage()
+			}
+		}
+	}
+
+	void createToc() {
+		TocProject toc = new TocProject( buildConfig )
+		toc.create()
+		buildProject toc.name
+		cleanUp()
+	}
+
+	void create() {
+		projects.each { name ->
+			ant.echo level: 'info', "Creating project $name"
+			new Project( name, buildConfig ).create()
+		}
+	}
+
+	void generate() {
+		assert projects.size()
+		validateMarkDown()
+		build()
+		cleanUp()
+	}
+
+	void initDoxygen() {
+		if ( !doxygenInitialised ) {
+			ant.with {
+				echo level: 'debug', "buildConfig.doxygen.path $buildConfig.doxygen.path"
+				echo level: 'debug', "buildConfig.doxygen.ant.classPath $buildConfig.doxygen.ant.classPath"
+				echo level: 'debug', "buildConfig.doxygen.ant.className $buildConfig.doxygen.ant.className"
+
+				taskdef(
+					name: "doxygen",
+					classname: buildConfig.doxygen.ant.className,
+					classpath:  buildConfig.doxygen.ant.classPath )
+			}
+			doxygenInitialised = true
+		}
+	}
+
+	void cleanUp() {
+		ant.delete( verbose: buildConfig.verboseCleanUp ) {
+			fileset( dir: tempFolder ) {
+				include name: 'doxygen*.cfg'
+			}
+		}
+	}
+
+	private String getTempFolder() {
+		System.properties[ 'java.io.tmpdir' ]
+	}
+
+	void build() {
+		ant.echo level: 'info', "Building $projects"
+		projects.each { projectName ->
+			buildProject projectName
+		}
+		ant.echo level: 'info', "Sucess: Built project $projects"
+	}
+
+	void buildProject( projectName ) {
+		Project project = new Project( projectName, buildConfig )
+		ant.echo level: 'info', "Building project: $project"
+		project.cleanOutputFolders()
+
+		ant.doxygen(
+				verbose: buildConfig.doxygen.verbose,
+				configFilename: project.configFileName,
+				doxygenPath: buildConfig.doxygen.path ) {
+			//property( name: 'PROJECT_NAME', value: "$config Portfolio" )
+			//property( name: 'ENABLED_SECTIONS', value: config )
+		}
+	}
+
+	/// Check for bad \\page directives in markdown files.
+	void validateMarkDown() {
+		ant.with {
+			def scanner = fileScanner {
+				fileset( dir: '.' ) {
+					include( name: '**/*.md' )
+					exclude( name: 'doxygen.md' ) // \todo fix this, maybe with an include file
+				}
+			}
+
+			int badPages = 0
+			for (file in scanner) {
+				file.eachLine { line, num ->
+					if ( line ==~ /\\page(\s+\w+){0,1}/ ) {
+						++badPages
+						echo level: 'error', message: "Bad page directive in $file at line $num"
+					}
+				}
+			}
+
+			if ( badPages ) {
+				fail "$badPages bad page directives found."
+			}
+		}
+	}
+}
