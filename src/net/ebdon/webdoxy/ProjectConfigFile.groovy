@@ -16,7 +16,7 @@ class ProjectConfigFile {
 		project = p
 		ant = project.ant
 	}
-	
+
 	void create() {
 		configFile = new File( project.configFileName )
 		if ( !configFile.exists() ) {
@@ -24,8 +24,8 @@ class ProjectConfigFile {
 			project.with {
 				set '@INCLUDE',			buildConfig.project.baseDoxyFile
 				set 'PROJECT_NAME',		name
-				set 'PROJECT_BRIEF',		"\"${brief}\""
-				set 'INPUT',				sourceFolder
+				set 'PROJECT_BRIEF',	"\"${brief}\""
+				set 'INPUT',			sourceFolder
 				set 'DIAFILE_DIRS',		diaFolder
 				set 'ENABLED_SECTIONS',	name
 
@@ -34,10 +34,10 @@ class ProjectConfigFile {
 				set 'LATEX_OUTPUT',		"${buildConfig.project.parentfolders.latex}/$name"
 				add 'IMAGE_PATH',		imageFolder
 
-				set 'GENERATE_HTML',		htmlRequired
-				set 'GENERATE_LATEX',		latexRequired
-				set 'DISABLE_INDEX',		disableIndex
-				set 'GENERATE_TREEVIEW',	generateTreeView
+				set 'GENERATE_HTML',	htmlRequired
+				set 'GENERATE_LATEX',	latexRequired
+				set 'DISABLE_INDEX',	disableIndex
+				set 'GENERATE_TREEVIEW',generateTreeView
 
 				exampleFolders.each { ef ->
 					add 'EXAMPLE_PATH', "$rootFolder/$ef"
@@ -45,9 +45,9 @@ class ProjectConfigFile {
 			}
 		} else {
 			ant.echo level: 'warn', "Configuration file for project ${project.name} already exists."
-		}	
+		}
 	}
-	
+
 	void set( key, value ) {
 		assert configFile
 		configFile << "${key.padRight( 25 )} = ${value}\n"
