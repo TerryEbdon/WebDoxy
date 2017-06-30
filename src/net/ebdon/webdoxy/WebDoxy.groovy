@@ -110,9 +110,18 @@ class WebDoxy {
 
 	WebDoxy( cliArgs ) {
 		checkInstall()
-		buildConfig = new ConfigSlurper().parse( new File( 'config.groovy' ).toURI().toURL())
-		projects = cliArgs ?: buildConfig.defaultProjects
-		initDoxygen()
+		final String configFileName = 'config.groovy'
+
+		File configFile = new File( configFileName )
+
+		if ( configFile.exists() ) {
+			buildConfig = new ConfigSlurper().parse( configFile.toURI().toURL())
+			projects = cliArgs ?: buildConfig.defaultProjects
+			initDoxygen()
+		} else {
+			ant.echo level: 'error', "Current folder: ${configFile.absolutePath}"
+			ant.fail "Can't find configuration file: $configFileName"
+		}
 	}
 
 	void checkInstall() {

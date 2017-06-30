@@ -62,13 +62,33 @@ class Project {
 	}
 	
 	def message( key ) {
-		if (!bundle) {
-			bundle = ResourceBundle.getBundle( "resources.Language" )
+		loadBundle()
+		try {
+			bundle.getString(key)
+		} catch ( java.util.MissingResourceException ex ) {
+			ant.echo '.'
+			ant.echo '---------------------------------------------'
+			ant.fail "Couldn't load resource / message: ${ex.message}"
 		}
-		ant.echo level:'info', "Project -- ${bundle.getString('hello')}"
-		bundle.getString(key)
 	}
 
+
+	private void loadBundle() {
+		try {
+			ant.echo level: 'info', 'Checking resource bundle.'
+			if (!bundle) {
+				ant.echo level: 'info', 'Bundle not loaded yet... getting it.'
+				bundle = ResourceBundle.getBundle( "resources.Language" )
+			} else {
+				ant.echo level: 'info', "Nothing to do.. resource bundle was already loaded."
+			}
+		} catch ( java.util.MissingResourceException ex ) {
+			ant.echo '.'
+			ant.echo '---------------------------------------------'
+			ant.fail "Failed to load resource bundle: ${ex.message}"
+		}
+		ant.echo level: 'info', "Resource bundle looks good."
+	}
 	private void createConfigFile() {
 		new ProjectConfigFile( this ).create()
 	}
