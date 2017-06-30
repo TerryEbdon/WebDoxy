@@ -1,8 +1,23 @@
 /**
  * @file
- * @author  Terry Ebdon
+ * @author	Terry Ebdon
+ * @date	JUN-2017
+ * @copyright
+ *
+ * Copyright 2017 Terry Ebdon
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
  package net.ebdon.webdoxy;
 
 import java.text.SimpleDateFormat;
@@ -17,10 +32,7 @@ class JournalProject extends Project {
 	}
 
     def createPage() {
-        // final pageFolder     = "${yearFolder}${monthFolder}${dayFolder}"
         final fullFolderPath = "${monthFolderPath}${dayFolder}"
-        // final pageFilePath   = "${pageFolder}${pageFileName}"
-        // final fullPath       = "$sourceFolder/$pageFilePath"
         final fullPath       = "${fullFolderPath}${pageFileName}"
 
         ant.with {
@@ -38,9 +50,10 @@ class JournalProject extends Project {
             page.create()
             addPageToMonth page
         } else {
-            ant.echo level: 'warn', "Nothing to do --- Diary page already exists."
+			ant.echo level: 'warn', message( 'JournalProject.nothingToDo' )
         }
     }
+
 
     def addPageToMonth( JournalPage dayPage ) {
         if ( buildConfig.project.journal.pages.monthly.required ) {
