@@ -170,7 +170,9 @@ class JournalPage {
 	        case [3,23]:        "rd"; break
 	        case 4..9:          "th"; break
 	        case 24..29:        "th"; break
-	        default: 'Huh?'
+			case 30:			"th"; break
+	        default: 
+				project.ant.fail "Unexpected day No. ${d.date}"
 	    }
 	}
 
