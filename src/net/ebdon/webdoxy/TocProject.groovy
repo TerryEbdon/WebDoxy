@@ -48,7 +48,11 @@ class TocProject extends Project {
 	}
 
 	def getGenerateTreeView() {
-		"NO"
+		buildConfig.project.toc.generateTreeView
+	}
+
+	def getDisableIndex() {
+		buildConfig.project.toc.disableIndex
 	}
 
 	/**
