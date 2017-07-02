@@ -60,7 +60,7 @@ class Project {
 			ant.mkdir dir: "$rootFolder/$ef"
 		}
 	}
-	
+
 	def message( key ) {
 		loadBundle()
 		try {
@@ -94,8 +94,8 @@ class Project {
 	}
 
 	def getMarkdownFileType() {
-        buildConfig.markdown.fileType
-    }
+		buildConfig.markdown.fileType
+	}
 
 	void setConfig( configFile, key, value ) {
 		configFile << "${key.padRight( 25 )} = ${value}\n"
