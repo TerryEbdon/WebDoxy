@@ -1,7 +1,7 @@
 /**
-\file
-\author Terry Ebdon
-\brief This file configures the build process.
+@file
+@author Terry Ebdon
+@brief This file configures the build process.
 */
 
 verboseCleanUp    = false
@@ -14,8 +14,11 @@ backup {
 
 project {
 	toc {
-		name  = 'TableOfContents'
-		brief = 'Directory of known, documented, projects that have been built.'
+		name             = 'TableOfContents'
+		brief            = 'Directory of known, documented, projects that have been built.'
+
+		disableIndex     = "NO"		// Overide the generic project setting.
+		generateTreeView = "YES"	// Overide the generic project setting
 	}
 
 	baseDoxyFile     = "Doxyfile."
@@ -39,12 +42,12 @@ project {
 				required            = true
 				format              = 'YYYY-MM'
 				addLinkToNewDayPage = true
-				linkPrefix          = ' - '
-				linkSuffix          = ' -- '
+				linkPrefix          = '- '		// List of days.
+				linkSuffix          = ' -- <!-- add summary here -->'
 			}
 			annual {
 				required = false
-				format = ''
+				format   = ''
 				addLinkToNewMonthPage = true
 			}
 			tweetTemplate =
@@ -82,22 +85,4 @@ doxygen {
 	}
 }
 
-baseSections = "live wibble"
-sites {
-	build {
-		enabled_sections = 'build'
-	}
-	live {
-		ENABLED_SECTIONS = baseSections
-		//RECURSIVE = 'NO'
-	}
 
-	draft {
-		ENABLED_SECTIONS = "$baseSections test wip draft staged"
-	}
-
-	blog {
-		input = 'blog'
-		ENABLED_SECTIONS = "$baseSections blog"
-	}
-}
