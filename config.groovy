@@ -65,7 +65,7 @@ project {
 			day         = 'dd'
 			shorter     = 'dd-MMM-yyyy'
 			fileName    = 'yyyy-MM-dd'
-			longer      = 'EEEE dd?? MMMM, yyyy'
+			longer      = 'EEEE d?? MMMM, yyyy'
 			anchorDay   = 'yyyyMMdd'
 			anchorMonth = 'yyyyMM'
 			longerMonth = "MMMM, YYYY"
