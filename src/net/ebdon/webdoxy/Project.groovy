@@ -75,19 +75,19 @@ class Project {
 
 	private void loadBundle() {
 		try {
-			ant.echo level: 'info', 'Checking resource bundle.'
+			ant.echo level: 'debug', 'Checking resource bundle.'
 			if (!bundle) {
-				ant.echo level: 'info', 'Bundle not loaded yet... getting it.'
+				ant.echo level: 'debug', 'Bundle not loaded yet... getting it.'
 				bundle = ResourceBundle.getBundle( "resources.Language" )
 			} else {
-				ant.echo level: 'info', "Nothing to do.. resource bundle was already loaded."
+				ant.echo level: 'debug', "Nothing to do.. resource bundle was already loaded."
 			}
 		} catch ( java.util.MissingResourceException ex ) {
 			ant.echo '.'
 			ant.echo '---------------------------------------------'
 			ant.fail "Failed to load resource bundle: ${ex.message}"
 		}
-		ant.echo level: 'info', "Resource bundle looks good."
+		ant.echo level: 'debug', "Resource bundle looks good."
 	}
 	private void createConfigFile() {
 		new ProjectConfigFile( this ).create()
