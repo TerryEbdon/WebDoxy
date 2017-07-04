@@ -24,14 +24,20 @@ import java.text.SimpleDateFormat;
 
 class JournalProject extends Project {
 
-	private final Date pageDate = new Date()
+	private Date pageDate = new Date()
 
 	JournalProject( projectName, buildConfig ) {
 		super( projectName, buildConfig )
 		final SimpleDateFormat anchorFormat = dateFormatter( 'anchor.day' )
 	}
 
-	def createPage() {
+	def getPageDate() {
+		this.pageDate
+	}
+
+	def createPage( Date date ) {
+		pageDate = date
+
 		final fullFolderPath = "${monthFolderPath}${dayFolder}"
 		final fullPath       = "${fullFolderPath}${pageFileName}"
 
@@ -50,12 +56,14 @@ class JournalProject extends Project {
 			page.create()
 			addPageToMonth page
 		} else {
-			ant.echo level: 'warn', message( 'JournalProject.nothingToDo' )
+			ant.echo level: 'warn',  message( 'JournalProject.nothingToDo' )
+			ant.echo level: 'debug', " --> ${pageFile.absolutePath}"
 		}
 	}
 
 
 	def addPageToMonth( JournalPage dayPage ) {
+		assert dayPage
 		if ( buildConfig.project.journal.pages.monthly.required ) {
 			final def monthFmtStr = buildConfig.project.journal.pages.monthly.format
 			ant.echo level: 'debug', "Month format string: ${monthFmtStr}"
@@ -66,6 +74,8 @@ class JournalProject extends Project {
 			MonthPage monthPage = new MonthPage( this, monthFile )
 			monthPage.create()
 			if ( buildConfig.project.journal.pages.monthly.addLinkToNewDayPage ) {
+				ant.echo level: 'info', "Adding: $dayPage"
+				ant.echo level: 'info', "    to: $monthPage"
 				monthPage.addSubPage dayPage
 			}
 		}

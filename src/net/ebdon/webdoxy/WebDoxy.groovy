@@ -72,28 +72,40 @@ class WebDoxy {
 	def projects = [] // aa / !  < List of projects that the commansd(s) will apply to
 	Boolean doxygenInitialised = false
 	def buildConfig
-	AntBuilder ant = new AntBuilder()
+	static AntBuilder ant = new AntBuilder()
+	final def cliOptions
 
 	public static main( args ) {
-		def cli = new CliBuilder(usage: 'Build -[bcgh] [project-name]*')
+		ant.echo level: 'info', "args: $args"
+		def cli = new CliBuilder(usage: 'Build -[bcdghjntv] [project-name]*')
 
 		cli.with {
-			h longOpt: 'help', 'Show usage information'
-			c longOpt: 'create', 'Create configuration file and source folders for project(s)'
-			g longOpt: 'generate', 'Generate web site(s) for project(s)'
-			b longOpt: 'backup', 'Backup configuration & source files for all projects'
-			v longOpt: 'validate', 'Run a validation check on the specified projects'
-			t longOpt: 'toc', 'Create a table of contents page, referencing all configured projects'
-			d longOpt: 'day', 'Create a daily diary entry'
+			h args: 0, longOpt: 'help',						'Show usage information'
+			c args: 0, longOpt: 'create',					'Create configuration file and source folders for project(s)'
+			g args: 0, longOpt: 'generate',					'Generate web site(s) for project(s)'
+			b args: 0, longOpt: 'backup',					'Backup configuration & source files for all projects'
+			v args: 0, longOpt: 'validate',					'Run a validation check on the specified projects'
+			t args: 0, longOpt: 'toc',						'Create a table of contents page, referencing all configured projects'
+			j args: 0, longOpt: 'journal',					'Create a daily diary entry'
+			d args: 1, longOpt: 'date',						'Optional date for journal entry. Today if not specified'
+			n args: 1, longOpt:	'number', 	type: Integer,	'number of days to generate'
 		}
 
 		def options = cli.parse(args)
+		ant.echo level: 'info', "CliBuilder.arguments: ${options.arguments()}"
 		if (options) {
-			WebDoxy build = new WebDoxy( options.arguments() )
+			ant.echo level: 'info', "Working..."
+			// WebDoxy build = new WebDoxy( options.arguments() )
+			WebDoxy build = new WebDoxy( options )
+			if (options.h) {
+				println "\n"
+				cli.usage()
+				return
+			}
 			if ( options.c ) {
 				build.create()
 			}
-			if ( options.d ) {
+			if ( options.j ) {
 				build.addDiaryPage()
 			}
 			if ( options.g ) {
@@ -108,7 +120,7 @@ class WebDoxy {
 		}
 	}
 
-	WebDoxy( cliArgs ) {
+	WebDoxy( options ) {
 		checkInstall()
 		final String configFileName = 'config.groovy'
 
@@ -117,7 +129,8 @@ class WebDoxy {
 		if ( configFile.exists() ) {
 			ant.echo level: 'info', "Using config file: ${configFile.absolutePath}"
 			buildConfig = new ConfigSlurper().parse( configFile.toURI().toURL())
-			projects = cliArgs ?: buildConfig.defaultProjects
+			projects = options.arguments() ?: buildConfig.defaultProjects
+			cliOptions = options
 			initDoxygen()
 		} else {
 			ant.echo level: 'error', "Current folder: ${configFile.absolutePath}"
@@ -137,8 +150,26 @@ class WebDoxy {
 
 	void addDiaryPage() {
 		projects.each { projectName ->
-			new JournalProject( projectName, buildConfig ).with {
-				createPage()
+			ant.echo level: 'info', "Adding journal page to: $projectName"
+			def pageDate = new Date()
+			if ( cliOptions.date ) {
+				ant.echo "** NOT **Using date: ${cliOptions.date} -- option not yet supported."
+			} else {
+				ant.echo level: 'warn', 'Date not specified, defaulting to today.'
+			}
+
+			int numPagesWanted = Integer.parseInt( cliOptions.number ?: '1' )
+			ant.echo level: 'info', "Generating $numPagesWanted journal pages."
+
+			if ( numPagesWanted > 0 && numPagesWanted < 367 ) {
+				new JournalProject( projectName, buildConfig ).with {
+					numPagesWanted.times {
+						ant.echo "Generating page for ${pageDate}"
+						createPage( pageDate++ )
+					}
+				}
+			} else {
+				ant.fail( "Number $numPagesWanted is outside expected range of 1..366" )
 			}
 		}
 	}
