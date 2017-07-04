@@ -38,7 +38,11 @@ project {
 
 	journal {
 		pages {
+			daily {
+				htmlIncludes = []
+			}
 			monthly {
+				htmlIncludes = []
 				required            = true
 				format              = 'YYYY-MM'
 				addLinkToNewDayPage = true
@@ -84,5 +88,3 @@ doxygen {
 		className = "org.doxygen.tools.DoxygenTask"
 	}
 }
-
-
