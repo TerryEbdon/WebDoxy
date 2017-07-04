@@ -27,7 +27,7 @@ class JournalPage {
 	final JournalProject project
 	private final buildConfig
 	private File pageFile
-	private final Date pageDate = new Date()
+	private Date pageDate = new Date()
 	private String anchorDate_ // final?
 	private String title_ // final?
 
@@ -39,18 +39,25 @@ class JournalPage {
 	JournalPage( JournalProject jp, File file ) {
 		project = jp
 		pageFile = file
+		pageDate = project.pageDate
 		buildConfig = project.buildConfig
 		init()
-		project.ant.echo level:'debug', "JournalPage instantiated."
+		project.ant.echo level:'info', "JournalPage instantiated, file: ${file.name}"
 	}
 
 	def init() {
 		final SimpleDateFormat dayAnchorFormatter = project.dateFormatter( 'anchorDay' )
 		final SimpleDateFormat shortFormat        = project.dateFormatter( 'shorter' )
 
-		project.ant.echo level: 'debug', "${dayAnchorFormatter.format( pageDate )}"
+		project.ant.echo level: 'info', "${dayAnchorFormatter.format( pageDate )}"
 		anchorDate = dayAnchorFormatter.format( pageDate )
 		title      = shortFormat.format( pageDate )
+	}
+
+	public String toString() {
+		final String className = this.class.simpleName.padLeft(11)
+		final String displayAnchor = anchorDate.padRight(8)
+		"${className} project: ${project.name} pageDate: $pageDate anchorDate: $displayAnchor title: $title"
 	}
 
 	def getPageDate() {
@@ -63,7 +70,7 @@ class JournalPage {
 	}
 
 	def getAnchorDate() {
-		project.ant.echo level:'debug', "getAnchorDate returning ${anchorDate_}"
+		// project.ant.echo level:'debug', "getAnchorDate returning ${anchorDate_}"
 		anchorDate_
 	}
 
@@ -165,15 +172,13 @@ class JournalPage {
 	def dayNumberSuffix( final Date d ) {
 		switch ( d.date ) {
 			case [1,21,31]:	"st"; break
-			case [2,22]:	"nd"; break
-			case [3,23]:	"rd"; break
-			case 4..9:		"th"; break
-			case 24..29:	"th"; break
-			case 30:		"th"; break
+			case 	[2,22]:	"nd"; break
+			case 	[3,23]:	"rd"; break
+			case	 4..30:	"th"; break
 			default:
 				project.ant.fail "Unexpected day No. ${d.date}"
+		}
 	}
-}
 
 	def htmlOnly( Closure closure ) {
 		append "@htmlonly"
