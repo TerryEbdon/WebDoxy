@@ -1,2 +1,6 @@
 syntax: glob
 *.class
+*.bak
+
+syntax: regexp
+^bin/
