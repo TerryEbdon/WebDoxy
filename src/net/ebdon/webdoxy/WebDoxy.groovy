@@ -115,6 +115,7 @@ class WebDoxy {
 		File configFile = new File( configFileName )
 
 		if ( configFile.exists() ) {
+			ant.echo level: 'info', "Using config file: ${configFile.absolutePath}"
 			buildConfig = new ConfigSlurper().parse( configFile.toURI().toURL())
 			projects = cliArgs ?: buildConfig.defaultProjects
 			initDoxygen()

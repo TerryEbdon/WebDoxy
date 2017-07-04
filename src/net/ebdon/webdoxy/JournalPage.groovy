@@ -25,7 +25,7 @@ import java.text.SimpleDateFormat
 class JournalPage {
 
 	final JournalProject project
-	private final buildConfig
+	final buildConfig
 	private File pageFile
 	private final Date pageDate = new Date()
 	private String anchorDate_ // final?
@@ -91,6 +91,7 @@ class JournalPage {
 	def createSkeletonHeader() {
 		append "@page ${pageAnchor} $title\n"
 		append "@anchor ${h1Anchor}"
+		addHtmlHeaderFragments()
 		append "# $firstHeaderTitle\n"
 	}
 
@@ -101,6 +102,32 @@ class JournalPage {
 		append tweetTemplate
 		append tweetTemplate
 		append tweetTemplate
+	}
+
+	def addHtmlHeaderFragments() {
+		def htmlFilesToInclude = htmlFileNames
+		if ( htmlFilesToInclude.size() ) {
+			project.ant.echo level: 'info', "Including: ${htmlFilesToInclude} into ${title}"
+			htmlFilesToInclude.each { fileName ->
+				addHtml fileName
+			}
+		} else {
+			noHtmlIncludesWarning()
+		}
+	}
+
+	def noHtmlIncludesWarning() {
+		final msg = "No WebDoxy HTML includes configured for ${title}"
+		project.ant.echo level: 'warn', msg
+		appendComment msg
+	}
+
+	def getHtmlFileNames() {
+		buildConfig.project.journal.pages.daily.htmlIncludes
+	}
+
+	def addHtml( fileName ) {
+		append "@htmlinclude $fileName"
 	}
 
 	def createSkeletonFooter() {
@@ -130,6 +157,10 @@ class JournalPage {
 
 	def getFirstHeaderTitleFormat() {
 		project.dateFormatter( 'longer' )
+	}
+
+	def appendComment( msg ) {
+		append "<!-- $msg -->"
 	}
 
 	def append( final content ) {
