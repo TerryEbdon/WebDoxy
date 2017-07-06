@@ -38,6 +38,7 @@ project {
 
 	journal {
 		pages {
+			useHtmlDateSuffix = false
 			daily {
 				htmlIncludes = []
 			}

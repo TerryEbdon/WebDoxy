@@ -158,8 +158,19 @@ class JournalPage {
 	}
 
 	def addSuffix( final dateString ) {
-		final def suffix = dayNumberSuffix( project.pageDate )
-		dateString.replace( '??', "<sup>$suffix</sup>" )
+		dateString.replace( '??', pageDateSuffix )
+	}
+
+	def getPageDateSuffix() {
+		if ( buildConfig.project.journal.pages.useHtmlDateSuffix ) {
+			dayNumberHtmlSuffix( project.pageDate )
+		} else {
+			dayNumberSuperSuffix( project.pageDate )
+		}
+	}
+
+	def dayNumberHtmlSuffix( date ) {
+		"<sup>${dayNumberSuffix( date )}</sup>"
 	}
 
 	def getFirstHeaderTitleFormat() {
@@ -199,6 +210,8 @@ class JournalPage {
 	 * @return       The English two letter day No. suffix.
 	 * @author 	Terry Ebdon
 	 * @date	23-JUN-2017
+	 *
+	 * @todo Allow for localisation
 	 */
 	def dayNumberSuffix( final Date d ) {
 		switch ( d.date ) {
@@ -211,6 +224,20 @@ class JournalPage {
 		}
 	}
 
+	/*
+	 * @todo Allow for localisation
+	 * @todo Address code duplication
+	 */
+	def dayNumberSuperSuffix( final Date d ) {
+		switch ( d.date ) {
+			case [1,21,31]:	"ˢᵗ"; break
+			case 	[2,22]:	"ⁿᵈ"; break
+			case 	[3,23]:	"ʳᵈ"; break
+			case	 4..30:	"ᵗʰ"; break
+			default:
+				project.ant.fail "Unexpected day No. ${d.date}"
+		}
+	}
 	def htmlOnly( Closure closure ) {
 		append "@htmlonly"
 		append closure.call()
