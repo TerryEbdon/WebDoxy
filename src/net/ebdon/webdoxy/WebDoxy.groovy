@@ -89,6 +89,8 @@ class WebDoxy {
 			j args: 0, longOpt: 'journal',					'Create a daily diary entry'
 			d args: 1, longOpt: 'date',						'Optional date for journal entry. Today if not specified'
 			n args: 1, longOpt:	'number', 	type: Integer,	'number of days to generate'
+			p args: 1, longOpt: 'project',					'project name, for stubs command'
+			s args: 0, longOpt: 'stub',						'generate stub files for given project'
 		}
 
 		def options = cli.parse(args)
@@ -117,6 +119,14 @@ class WebDoxy {
 			if ( options.b ) {
 				new Backup().run()
 			}
+
+			if ( options.s) {
+				if ( options.p ) {
+					build.stubs()
+				} else {
+					ant.fail "No project name provided."
+				}
+			}
 		}
 	}
 
@@ -129,7 +139,13 @@ class WebDoxy {
 		if ( configFile.exists() ) {
 			ant.echo level: 'info', "Using config file: ${configFile.absolutePath}"
 			buildConfig = new ConfigSlurper().parse( configFile.toURI().toURL())
-			projects = options.arguments() ?: buildConfig.defaultProjects
+
+			if ( options.p ) {
+				projects = [ options.project ]
+			} else {
+				projects = options.arguments() ?: buildConfig.defaultProjects
+			}
+
 			cliOptions = options
 			initDoxygen()
 		} else {
@@ -146,6 +162,18 @@ class WebDoxy {
 		// assert dotProperty.length() > 5
 		assert new File(dotProperty).exists()
 		assert "dot -?".execute().text.contains('Usage: dot')
+	}
+
+	void stubs() {
+		ant.echo level: 'info', "Adding stubs to projects: ${projects.join(', ')}"
+		ant.echo level: 'info', "Stubs are: ${cliOptions.arguments()}"
+
+		projects.each { projectName ->
+			Project project = new Project( projectName, buildConfig )
+			cliOptions.arguments().each { pageName ->
+				project.createStub pageName
+			}
+		}
 	}
 
 	void addDiaryPage() {

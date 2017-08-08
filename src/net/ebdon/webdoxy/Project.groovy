@@ -19,7 +19,7 @@
  * limitations under the License.
  */
 package net.ebdon.webdoxy;
-
+import java.text.SimpleDateFormat;
 /**
  @brief Class that generates a Doxygen project.
  @author Terry Ebdon
@@ -93,6 +93,9 @@ class Project {
 		new ProjectConfigFile( this ).create()
 	}
 
+	def getAuthor() {
+		buildConfig.project.author
+	}
 	def getMarkdownFileType() {
 		buildConfig.markdown.fileType
 	}
@@ -139,9 +142,53 @@ class Project {
 		}
 	}
 
-	String getMainMarkDownFileName() {
-		 "${sourceFolder}/@${name}_index.md"
+	def getPageDate() {
+		final SimpleDateFormat pageDateFormat =
+			new SimpleDateFormat( buildConfig.project.page.dateFormat )
+		def pageDate = pageDateFormat.format( new Date() )
 	}
+
+	def getStubListPageName() {
+		"${buildConfig.project.page.stub.name}"
+	}
+
+	void createStub( final pageName ) {
+		ant.echo level: 'info', "Creating stub page $pageName for project $name"
+		File pageFile = new File( markDownFileName( pageName ) )
+		if ( !pageFile.exists() ) {
+			pageFile << "\\page $pageName $pageName\n"
+			pageFile << "[TOC]\n"
+			pageFile << "\\date ${pageDate}\n"
+			pageFile << "\\author ${author.name}\n"
+			pageFile << "\\todo Replace this \\ref ${stubListPageName} with\n"
+			pageFile << "useful $pageName documentation.\n"
+			pageFile << "\n${buildConfig.project.page.stub.footer}\n"
+			addToStubList pageName
+		} else {
+			ant.echo level: 'warn',
+				"Page $pageName already exists for project $name"
+		}
+	}
+
+	void addToStubList( final pageName ) {
+		File stubListFile = new File( markDownFileName( stubListPageName ) )
+
+		if ( !stubListFile.exists() ) {
+			stubListFile << "\\page ${stubListPageName} ${stubListPageName}\n\n"
+		}
+
+		stubListFile << "\n- \\ref $pageName\n"
+	}
+
+	String getMainMarkDownFileName() {
+		//  "${sourceFolder}/@${name}_index.md"
+		markDownFileName "@${name}_index"
+	}
+
+	String markDownFileName( pageName ) {
+		 "${sourceFolder}/${pageName}.md"
+	}
+
 	Boolean exists () {
 		new File( configFileName ).exists()
 	}
