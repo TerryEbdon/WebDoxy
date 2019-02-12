@@ -38,12 +38,7 @@ project {
 
 	journal {
 		pages {
-			useHtmlDateSuffix = false
-			daily {
-				htmlIncludes = []
-			}
 			monthly {
-				htmlIncludes = []
 				required            = true
 				format              = 'YYYY-MM'
 				addLinkToNewDayPage = true
