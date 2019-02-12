@@ -1,3 +1,5 @@
+package net.ebdon.webdoxy;
+
 /**
  * @file
  * @author	Terry Ebdon
@@ -18,7 +20,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.ebdon.webdoxy;
 
 /**
 @brief Class that generates a Table-of-Contents HTML project, for post-proccessing with Doxygen.
@@ -73,11 +74,20 @@ class TocProject extends Project {
 				}
 			}
 
+			def indexedProjects = [] // Alphanumeric order, but case sensitive.
 			tocFile << "# Known Projects {#mainpage}\n"
 			for ( file in scanner ) {
 				def projectName = file.parentFile.name
 				echo level: 'info', "Indexing project $projectName"
-				tocFile << " - [${makeDisplayable( projectName)}](../$projectName/index.html)\n"
+				// tocFile << " - [${makeDisplayable( projectName)}](../$projectName/index.html)\n"
+				indexedProjects << " - [${makeDisplayable( projectName)}](../$projectName/index.html)\n"
+			}
+
+			indexedProjects.sort { a, b ->
+				a.compareToIgnoreCase b
+				// a <=> b
+			}.each {
+				tocFile << it
 			}
 		}
 	}

@@ -1,4 +1,5 @@
-package net.ebdon.webdoxy
+package net.ebdon.webdoxy;
+
 def f = new File('.')
 println "File: ${f.absolutePath}"
 //def rb = ResourceBundle.getBundle( "resources.Language" )

@@ -1,3 +1,5 @@
+package net.ebdon.webdoxy;
+
 /**
  * @file
  * @author	Terry Ebdon
@@ -19,7 +21,6 @@
  * limitations under the License.
  */
 
-package net.ebdon.webdoxy;
 
 /**
 @brief Groovy script to backup the web-doxy folder.
@@ -33,8 +34,8 @@ package net.ebdon.webdoxy;
 */
 class Backup {
 
-	def config
-	def ant = new AntBuilder()
+	def config;
+	def ant = new AntBuilder();
 
 	public static main( args ) {
 		new Backup().run()
@@ -48,10 +49,11 @@ class Backup {
 
 	public void run() {
 		ant.with {
-			final String backupTimestamp    = new Date().format('yyyy-MM-dd_HHmm')
-			final String backupFolderSuffix = "${new Date().format('yyyy/yyyy-MM')}"
-			final String backupFolder       = "backup/$backupFolderSuffix"
-			final String backupCopyRoot     = 'h:/'
+			final String backupTimestamp    	= new Date().format('yyyy-MM-dd_HHmm')
+			final String backupFolderSuffix 	= "${new Date().format('yyyy/yyyy-MM')}"
+			final String backupFolder       	= "backup/$backupFolderSuffix"
+			final String backupCopyRoot     	= config.backup.copyRoot
+			final String backupCopyFolderRoot = config.backup.copyFolderRoot
 			echo level: 'debug', "Timestamp:\t $backupTimestamp"
 			echo level: 'debug', "Folder:\t $backupFolder"
 			mkdir dir: backupFolder
@@ -69,11 +71,12 @@ class Backup {
 					)
 				}
 				if ( new File( backupCopyRoot ).exists() ) {
-					final String backupCopyFolder = "${backupCopyRoot}Backups/web sites/$backupFolderSuffix"
+					final String backupCopyFolder = backupCopyFolderRoot +
+							baseDir + '/' + backupFolderSuffix
 					mkdir dir: backupCopyFolder
 					copy file: zipFile, todir: backupCopyFolder
 				} else {
-					echo level: 'warn', "Backup drive is off-line!"
+					echo level: 'warn', "Backup drive $backupCopyRoot is off-line!"
 				}
 			} else {
 				echo level: 'warn', "Backup skipped, as zip already exists"

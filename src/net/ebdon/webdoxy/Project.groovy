@@ -1,3 +1,6 @@
+package net.ebdon.webdoxy;
+import java.text.SimpleDateFormat;
+
 /**
  * @file
  * @author	Terry Ebdon
@@ -18,8 +21,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.ebdon.webdoxy;
-import java.text.SimpleDateFormat;
+
 /**
  @brief Class that generates a Doxygen project.
  @author Terry Ebdon
@@ -30,7 +32,7 @@ import java.text.SimpleDateFormat;
 class Project {
 	final String name;
 	final def buildConfig;	//!< @see config.groovy
-	ResourceBundle bundle
+	ResourceBundle bundle;
 	AntBuilder ant;
 
 	Project( String pn, bc ) {

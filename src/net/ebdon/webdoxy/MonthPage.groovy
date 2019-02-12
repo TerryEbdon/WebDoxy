@@ -1,3 +1,6 @@
+package net.ebdon.webdoxy;
+import java.text.SimpleDateFormat;
+
 /**
  * @file
  * @author  Terry Ebdon
@@ -18,9 +21,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package net.ebdon.webdoxy;
-import java.text.SimpleDateFormat
 
 class MonthPage extends JournalPage {
 
