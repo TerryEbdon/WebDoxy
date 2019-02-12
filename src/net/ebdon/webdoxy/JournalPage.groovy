@@ -1,3 +1,6 @@
+package net.ebdon.webdoxy;
+import java.text.SimpleDateFormat;
+
 /**
  * @file
  * @author	Terry Ebdon
@@ -19,17 +22,14 @@
  * limitations under the License.
  */
 
-package net.ebdon.webdoxy;
-import java.text.SimpleDateFormat
-
 class JournalPage {
 
-	final JournalProject project
-	final buildConfig
-	private File pageFile
-	private Date pageDate = new Date()
-	private String anchorDate_ // final?
-	private String title_ // final?
+	final JournalProject project;
+	private final buildConfig;
+	private File pageFile;
+	private final Date pageDate = new Date();
+	private String anchorDate_; // final?
+	private String title_; // final?
 
 	/**
 	 * @author Terry Ebdon
@@ -39,25 +39,18 @@ class JournalPage {
 	JournalPage( JournalProject jp, File file ) {
 		project = jp
 		pageFile = file
-		pageDate = project.pageDate
 		buildConfig = project.buildConfig
 		init()
-		project.ant.echo level:'info', "JournalPage instantiated, file: ${file.name}"
+		project.ant.echo level:'debug', "JournalPage instantiated."
 	}
 
 	def init() {
 		final SimpleDateFormat dayAnchorFormatter = project.dateFormatter( 'anchorDay' )
 		final SimpleDateFormat shortFormat        = project.dateFormatter( 'shorter' )
 
-		project.ant.echo level: 'info', "${dayAnchorFormatter.format( pageDate )}"
+		project.ant.echo level: 'debug', "${dayAnchorFormatter.format( pageDate )}"
 		anchorDate = dayAnchorFormatter.format( pageDate )
 		title      = shortFormat.format( pageDate )
-	}
-
-	public String toString() {
-		final String className = this.class.simpleName.padLeft(11)
-		final String displayAnchor = anchorDate.padRight(8)
-		"${className} project: ${project.name} pageDate: $pageDate anchorDate: $displayAnchor title: $title"
 	}
 
 	def getPageDate() {
@@ -70,7 +63,7 @@ class JournalPage {
 	}
 
 	def getAnchorDate() {
-		// project.ant.echo level:'debug', "getAnchorDate returning ${anchorDate_}"
+		project.ant.echo level:'debug', "getAnchorDate returning ${anchorDate_}"
 		anchorDate_
 	}
 
@@ -98,7 +91,6 @@ class JournalPage {
 	def createSkeletonHeader() {
 		append "@page ${pageAnchor} $title\n"
 		append "@anchor ${h1Anchor}"
-		addHtmlHeaderFragments()
 		append "# $firstHeaderTitle\n"
 	}
 
@@ -111,32 +103,6 @@ class JournalPage {
 		append tweetTemplate
 	}
 
-	def addHtmlHeaderFragments() {
-		def htmlFilesToInclude = htmlFileNames
-		if ( htmlFilesToInclude.size() ) {
-			project.ant.echo level: 'info', "Including: ${htmlFilesToInclude} into ${title}"
-			htmlFilesToInclude.each { fileName ->
-				addHtml fileName
-			}
-		} else {
-			noHtmlIncludesWarning()
-		}
-	}
-
-	def noHtmlIncludesWarning() {
-		final msg = "No WebDoxy HTML includes configured for ${title}"
-		project.ant.echo level: 'warn', msg
-		appendComment msg
-	}
-
-	def getHtmlFileNames() {
-		buildConfig.project.journal.pages.daily.htmlIncludes
-	}
-
-	def addHtml( fileName ) {
-		append "@htmlinclude $fileName"
-	}
-
 	def createSkeletonFooter() {
 		htmlOnly {
 			"<a class='btn' href='#${h1Anchor}'>Top of page</a>"
@@ -145,7 +111,7 @@ class JournalPage {
 
 	def getTweetTemplate() {
 		/// @todo add filter to
-		/// convert \@tweep terry_ebdon into [\\@jack](https://twitter.com/\@jack)
+		/// convert \@tweep terry_ebdon into \[\@jack\](https://twitter.com/\@jack)
 		///
 
 		buildConfig.project.journal.pages.tweetTemplate
@@ -158,27 +124,12 @@ class JournalPage {
 	}
 
 	def addSuffix( final dateString ) {
-		dateString.replace( '??', pageDateSuffix )
-	}
-
-	def getPageDateSuffix() {
-		if ( buildConfig.project.journal.pages.useHtmlDateSuffix ) {
-			dayNumberHtmlSuffix( project.pageDate )
-		} else {
-			dayNumberSuperSuffix( project.pageDate )
-		}
-	}
-
-	def dayNumberHtmlSuffix( date ) {
-		"<sup>${dayNumberSuffix( date )}</sup>"
+		final def suffix = dayNumberSuffix( project.pageDate )
+		dateString.replace( '??', "<sup>$suffix</sup>" )
 	}
 
 	def getFirstHeaderTitleFormat() {
 		project.dateFormatter( 'longer' )
-	}
-
-	def appendComment( msg ) {
-		append "<!-- $msg -->"
 	}
 
 	def append( final content ) {
@@ -206,38 +157,24 @@ class JournalPage {
 
 	/**
 	 * dayNumberSuffix get the English suffix for a day No., i.e. st, nd, rd or th.
-	 * @param  final Date          d The date to get the day suffix for.
-	 * @return       The English two letter day No. suffix.
+	 * @param   d The date to get the day suffix for.
+	 * @return  The English two letter day No. suffix.
 	 * @author 	Terry Ebdon
 	 * @date	23-JUN-2017
-	 *
-	 * @todo Allow for localisation
 	 */
 	def dayNumberSuffix( final Date d ) {
 		switch ( d.date ) {
 			case [1,21,31]:	"st"; break
-			case 	[2,22]:	"nd"; break
-			case 	[3,23]:	"rd"; break
-			case	 4..30:	"th"; break
+			case [2,22]:	"nd"; break
+			case [3,23]:	"rd"; break
+			case 4..9:		"th"; break
+			case 24..29:	"th"; break
+			case 30:		"th"; break
 			default:
 				project.ant.fail "Unexpected day No. ${d.date}"
-		}
 	}
+}
 
-	/*
-	 * @todo Allow for localisation
-	 * @todo Address code duplication
-	 */
-	def dayNumberSuperSuffix( final Date d ) {
-		switch ( d.date ) {
-			case [1,21,31]:	"ˢᵗ"; break
-			case 	[2,22]:	"ⁿᵈ"; break
-			case 	[3,23]:	"ʳᵈ"; break
-			case	 4..30:	"ᵗʰ"; break
-			default:
-				project.ant.fail "Unexpected day No. ${d.date}"
-		}
-	}
 	def htmlOnly( Closure closure ) {
 		append "@htmlonly"
 		append closure.call()

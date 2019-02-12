@@ -1,3 +1,5 @@
+package net.ebdon.webdoxy;
+
 /**
  * @file
  * @author	Terry Ebdon
@@ -48,12 +50,12 @@ If not then add code to rename the PDF after it's been created.
 the dot executable . This allows dot to be used, by Doxygen,
 without being on the Windows path.
 
-## Overview
+# Overview
 At run-time the script will:
 1. Scan all input folders, checking files for obvious errors that may not be spotted by Doxygen
 2. Generate documentation for each configuration
 
-## Process
+# Process
 
 For each configured site (live, staged, draft...)
  - create a config file
@@ -65,15 +67,13 @@ For each configured site (live, staged, draft...)
 
  */
 
-package net.ebdon.webdoxy;
-
 class WebDoxy {
-	static final defaultConfigs = [ 'live', 'staged' ]
-	def projects = [] // aa / !  < List of projects that the commansd(s) will apply to
-	Boolean doxygenInitialised = false
-	def buildConfig
-	static AntBuilder ant = new AntBuilder()
-	final def cliOptions
+	static final defaultConfigs = [ 'live', 'staged' ];
+	def projects = []; ///< List of projects that the commansd(s) will apply to
+	Boolean doxygenInitialised = false;
+	def buildConfig;
+	static AntBuilder ant = new AntBuilder();
+	final def cliOptions;
 
 	public static main( args ) {
 		ant.echo level: 'info', "args: $args"
@@ -97,6 +97,7 @@ class WebDoxy {
 		ant.echo level: 'info', "CliBuilder.arguments: ${options.arguments()}"
 		if (options) {
 			ant.echo level: 'info', "Working..."
+			def before = System.currentTimeMillis()
 			// WebDoxy build = new WebDoxy( options.arguments() )
 			WebDoxy build = new WebDoxy( options )
 			if (options.h) {
@@ -127,6 +128,9 @@ class WebDoxy {
 					ant.fail "No project name provided."
 				}
 			}
+
+			def after = System.currentTimeMillis()
+			ant.echo "WebDoxy run completed in ${(after-before)/1000} seconds"
 		}
 	}
 
@@ -155,16 +159,17 @@ class WebDoxy {
 	}
 
 	void checkInstall() {
-		assert "perl --version".execute().text.contains('This is perl 5')
-		assert "latex --version".execute().text.contains('pdfTeX')
-		final String dotProperty = System.env['GRAPHVIZ_DOT']
-		assert dotProperty
-		// assert dotProperty.length() > 5
-		assert new File(dotProperty).exists()
-		assert "dot -?".execute().text.contains('Usage: dot')
+		//~ assert "perl --version".execute().text.contains('This is perl 5')
+		//~ assert "latex --version".execute().text.contains('pdfTeX')
+		//~ final String dotProperty = System.env['GRAPHVIZ_DOT']
+		//~ assert dotProperty
+		//~ // assert dotProperty.length() > 5
+		//~ assert new File(dotProperty).exists()
+		//~ assert "dot -?".execute().text.contains('Usage: dot')
 	}
 
 	void stubs() {
+
 		ant.echo level: 'info', "Adding stubs to projects: ${projects.join(', ')}"
 		ant.echo level: 'info', "Stubs are: ${cliOptions.arguments()}"
 
@@ -227,7 +232,7 @@ class WebDoxy {
 		if ( !doxygenInitialised ) {
 			ant.with {
 				echo level: 'debug', "buildConfig.doxygen.path $buildConfig.doxygen.path"
-				echo level: 'debug', "buildConfig.doxygen.ant.classPath $buildConfig.doxygen.ant.classPath"
+				echo level: 'info', "buildConfig.doxygen.ant.classPath $buildConfig.doxygen.ant.classPath"
 				echo level: 'debug', "buildConfig.doxygen.ant.className $buildConfig.doxygen.ant.className"
 
 				taskdef(
@@ -261,6 +266,7 @@ class WebDoxy {
 
 	void buildProject( projectName ) {
 		Project project = new Project( projectName, buildConfig )
+		def before = System.currentTimeMillis()
 		ant.echo level: 'info', "Building project: $project"
 		project.cleanOutputFolders()
 
@@ -271,15 +277,21 @@ class WebDoxy {
 			//property( name: 'PROJECT_NAME', value: "$config Portfolio" )
 			//property( name: 'ENABLED_SECTIONS', value: config )
 		}
+		def after = System.currentTimeMillis()
+		ant.echo "Project built in ${(after-before)/1000} seconds"
 	}
 
 	/// Check for bad \\page directives in markdown files.
+	/// @todo also check for the \@page variant.
 	void validateMarkDown() {
 		ant.with {
 			def scanner = fileScanner {
 				fileset( dir: '.' ) {
-					include( name: '**/*.md' )
-					exclude( name: 'doxygen.md' ) // \todo fix this, maybe with an include file
+					include( name: "**/*.md" )
+							/// @note ^^ double quotes, not single, as otherwise
+							/// Doxygen thinks the regex starts a comment block.
+							/// \todo Fix this, maybe with an include file?
+					exclude( name: 'doxygen.md' )
 				}
 			}
 

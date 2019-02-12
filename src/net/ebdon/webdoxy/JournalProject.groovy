@@ -1,3 +1,7 @@
+package net.ebdon.webdoxy;
+
+import java.text.SimpleDateFormat;
+
 /**
  * @file
  * @author	Terry Ebdon
@@ -18,13 +22,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.ebdon.webdoxy;
-
-import java.text.SimpleDateFormat;
 
 class JournalProject extends Project {
 
-	private Date pageDate = new Date()
+	private Date pageDate = new Date();
 
 	JournalProject( projectName, buildConfig ) {
 		super( projectName, buildConfig )
@@ -100,9 +101,8 @@ class JournalProject extends Project {
 	}
 
 	/**
-	 * [dateFolder description]
-	 * @param  String folderReqdProp    annual, month or day -- name of string property.
-	 * @param  String formatProp    = folderProp + 'ly' name of boolean property.
+	 * @param folderReqdProp	annual, month or day -- name of string property.
+	 * @param formatProp    	folderProp + 'ly' name of boolean property.
 	 * @return        The folder name or an empty string, if not required.
 	 */
 	def dateFolder( String formatProp, String  folderReqdProp = formatProp + 'ly' ) {

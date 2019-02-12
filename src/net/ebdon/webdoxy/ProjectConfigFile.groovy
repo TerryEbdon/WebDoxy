@@ -1,3 +1,5 @@
+package net.ebdon.webdoxy;
+
 /**
  * @file
  * @author	Terry Ebdon
@@ -18,12 +20,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.ebdon.webdoxy;
 
 class ProjectConfigFile {
-	final Project project
-	File configFile
-	AntBuilder ant
+	final Project project;
+	File configFile;
+	AntBuilder ant;
 
 	ProjectConfigFile( Project p ) {
 		assert p
