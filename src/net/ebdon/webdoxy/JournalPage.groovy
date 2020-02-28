@@ -167,9 +167,9 @@ class JournalPage {
 			case [1,21,31]:	"st"; break
 			case [2,22]:	"nd"; break
 			case [3,23]:	"rd"; break
-			case 4..9:		"th"; break
+			case 4..20:		"th"; break
 			case 24..29:	"th"; break
-			case 30:		"th"; break
+			case 30:		  "th"; break
 			default:
 				project.ant.fail "Unexpected day No. ${d.date}"
 	}
