@@ -7,7 +7,7 @@
 verboseCleanUp    = false
 defaultProjects   = ['@Work-in-Progress']
 markdown.fileType = '.md'
-
+datePattern       =  'yyyy-MM-dd'
 backup {
 	excludesFile = "backupExcludes.txt"
 }

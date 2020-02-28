@@ -38,6 +38,7 @@ class JournalPage {
 	 */
 	JournalPage( JournalProject jp, File file ) {
 		project = jp
+		pageDate = project.pageDate
 		pageFile = file
 		buildConfig = project.buildConfig
 		init()

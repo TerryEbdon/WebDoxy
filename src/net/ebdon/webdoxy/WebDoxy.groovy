@@ -186,7 +186,7 @@ class WebDoxy {
 			ant.echo level: 'info', "Adding journal page to: $projectName"
 			def pageDate = new Date()
 			if ( cliOptions.date ) {
-				ant.echo "** NOT **Using date: ${cliOptions.date} -- option not yet supported."
+				pageDate = Date.parse( buildConfig.datePattern, cliOptions.date )
 			} else {
 				ant.echo level: 'warn', 'Date not specified, defaulting to today.'
 			}
