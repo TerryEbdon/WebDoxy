@@ -191,7 +191,7 @@ class WebDoxy {
 				ant.echo level: 'warn', 'Date not specified, defaulting to today.'
 			}
 
-			int numPagesWanted = Integer.parseInt( cliOptions.number ?: '1' )
+			int numPagesWanted = cliOptions.number ?: 1
 			ant.echo level: 'info', "Generating $numPagesWanted journal pages."
 
 			if ( numPagesWanted > 0 && numPagesWanted < 367 ) {
