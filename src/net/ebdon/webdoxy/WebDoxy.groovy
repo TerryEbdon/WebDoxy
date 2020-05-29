@@ -196,7 +196,7 @@ class WebDoxy {
 			int numPagesWanted = cliOptions.number ?: 1
 			ant.echo level: 'info', "Generating $numPagesWanted journal pages."
 
-			if ( numPagesWanted > 0 && numPagesWanted < 367 ) {
+			if ( numPagesWanted > 0 && numPagesWanted <= maxPages ) {
 				new JournalProject( projectName, buildConfig ).with {
 					numPagesWanted.times {
 						ant.echo "Generating page for ${pageDate}"
@@ -204,7 +204,7 @@ class WebDoxy {
 					}
 				}
 			} else {
-				ant.fail( "Number $numPagesWanted is outside expected range of 1..366" )
+				ant.fail( "Number $numPagesWanted is outside expected range of 1..$maxPages" )
 			}
 		}
 	}
@@ -224,6 +224,10 @@ class WebDoxy {
 		cliOptions.week ? 7 : 1
 	}
 
+	int getMaxPages() {
+		cliOptions.week ? 53 : 366
+	}
+
 	void addWeeklyPage() {
 		projects.each { projectName ->
 			ant.echo level: 'info', "Adding weekly page to: $projectName"
@@ -236,7 +240,6 @@ class WebDoxy {
 			ant.echo level: 'info',
 				"Creating a weekly page for year $pageYear, week $pageWeek"
 
-			final int maxPages = 53 // \todo maxPage should be a property.
 			ant.echo level: 'info', "Max pages allowed: $maxPages"
 
 			int numPagesWanted = cliOptions.number ?: 1
