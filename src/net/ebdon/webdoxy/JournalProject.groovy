@@ -1,6 +1,7 @@
 package net.ebdon.webdoxy;
 
 import java.text.SimpleDateFormat;
+import java.time.temporal.IsoFields;
 
 /**
  * @file
@@ -34,6 +35,48 @@ class JournalProject extends Project {
 
 	def getPageDate() {
 		this.pageDate
+	}
+
+	String monthTitle( final Date monday, final Date sunday ) {
+
+		final SimpleDateFormat monthFormat =	new SimpleDateFormat( 'MMM' )
+
+		final startMonth = monthFormat.format( monday )
+		final endMonth	 = monthFormat.format( sunday )
+
+		// println "startMonth: $startMonth"
+		// println "endMonth:   $endMonth"
+
+		startMonth == endMonth ? startMonth : "$startMonth / $endMonth"
+	}
+
+	String getPageTitle() {
+		final zonedDate = pageDate.toZonedDateTime()
+		final pageYear = zonedDate.get( IsoFields.WEEK_BASED_YEAR )
+		final pageWeek = zonedDate.get( IsoFields.WEEK_OF_WEEK_BASED_YEAR )
+		final Date sunday = pageDate + 6
+
+		ant.echo level: 'info',
+			"Creating weekly page title for year $pageYear, week $pageWeek"
+
+		final pageAnchor = "{#y${pageYear}_w${pageWeek}}"
+		"# ${monthTitle( pageDate, sunday )} -- $pageYear week $pageWeek $pageAnchor"
+	}
+
+	def createWeekPage ( final Date date ) {
+
+		pageDate = date - date.toZonedDateTime().dayOfWeek.value + 1 // Monday of target week
+		
+		println pageTitle
+		println '\n[TOC]\n'
+
+		final SimpleDateFormat pageDateFormat =
+			new SimpleDateFormat( '''## dd EEE {#'day'_yyyy_MM_dd}\n''' )
+			// new SimpleDateFormat( buildConfig.project.page.dateFormat )
+
+		7.times {
+			println pageDateFormat.format( pageDate++ )
+		}
 	}
 
 	def createPage( Date date ) {
