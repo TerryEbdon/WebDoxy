@@ -91,6 +91,7 @@ class WebDoxy {
 			n args: 1, longOpt:	'number', 	type: Integer,	'number of days to generate'
 			p args: 1, longOpt: 'project',					'project name, for stubs command'
 			s args: 0, longOpt: 'stub',						'generate stub files for given project'
+			w args: 0, longOpt: 'week',						'Create weekly diary page'
 		}
 
 		def options = cli.parse(args)
@@ -203,6 +204,54 @@ class WebDoxy {
 				}
 			} else {
 				ant.fail( "Number $numPagesWanted is outside expected range of 1..366" )
+			}
+		}
+	}
+
+	Date getTargetDate() {
+		Date pageDate = new Date()
+
+		if ( cliOptions.date ) {
+			pageDate = Date.parse( buildConfig.datePattern, cliOptions.date )
+		} else {
+			ant.echo level: 'warn', 'Date not specified, defaulting to today.'
+		}
+		pageDate
+	}
+
+	int getDateIncrement() {
+		cliOptions.week ? 7 : 1
+	}
+
+	void addWeeklyPage() {
+		projects.each { projectName ->
+			ant.echo level: 'info', "Adding weekly page to: $projectName"
+			def pageDate = targetDate
+
+			ant.echo level: 'info', 'Creating a weekly page'
+			final zonedDate = pageDate.toZonedDateTime()
+			final pageYear = zonedDate.get( IsoFields.WEEK_BASED_YEAR )
+			final pageWeek = zonedDate.get( IsoFields.WEEK_OF_WEEK_BASED_YEAR )
+			ant.echo level: 'info',
+				"Creating a weekly page for year $pageYear, week $pageWeek"
+
+			final int maxPages = 53 // \todo maxPage should be a property.
+			ant.echo level: 'info', "Max pages allowed: $maxPages"
+
+			int numPagesWanted = cliOptions.number ?: 1
+			ant.echo level: 'info',
+				"Generating $numPagesWanted journal pages with increment of $dateIncrement."
+
+			if ( numPagesWanted > 0 && numPagesWanted <= maxPages ) {
+				new JournalProject( projectName, buildConfig ).with {
+					numPagesWanted.times {
+						ant.echo "Generating page for ${pageDate}"
+						createPage( pageDate ) // \todo Implement weekly page creation
+						pageDate += dateIncrement
+					}
+				}
+			} else {
+				ant.fail( "Number $numPagesWanted is outside expected range of 1..${maxPages}" )
 			}
 		}
 	}
