@@ -1,5 +1,7 @@
 package net.ebdon.webdoxy;
 
+import java.time.temporal.IsoFields;
+
 /**
  * @file
  * @author	Terry Ebdon
@@ -109,8 +111,11 @@ class WebDoxy {
 			if ( options.c ) {
 				build.create()
 			}
-			if ( options.j ) {
+			if ( options.journal ) {
 				build.addDiaryPage()
+			}
+			if ( options.week ) {
+				build.addWeeklyPage()
 			}
 			if ( options.g ) {
 				build.generate()
@@ -185,12 +190,8 @@ class WebDoxy {
 	void addDiaryPage() {
 		projects.each { projectName ->
 			ant.echo level: 'info', "Adding journal page to: $projectName"
-			def pageDate = new Date()
-			if ( cliOptions.date ) {
-				pageDate = Date.parse( buildConfig.datePattern, cliOptions.date )
-			} else {
-				ant.echo level: 'warn', 'Date not specified, defaulting to today.'
-			}
+
+			def pageDate = targetDate
 
 			int numPagesWanted = cliOptions.number ?: 1
 			ant.echo level: 'info', "Generating $numPagesWanted journal pages."
