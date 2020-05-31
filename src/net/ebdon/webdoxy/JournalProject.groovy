@@ -63,10 +63,14 @@ class JournalProject extends Project {
 		"# ${monthTitle( pageDate, sunday )} -- $pageYear week $pageWeek $pageAnchor"
 	}
 
+	Date startOfWeek( final Date date ) {
+		date - date.toZonedDateTime().dayOfWeek.value + 1 // Monday of target week
+	}
+
 	def createWeekPage ( final Date date ) {
 
-		pageDate = date - date.toZonedDateTime().dayOfWeek.value + 1 // Monday of target week
-		
+		pageDate = startOfWeek( date )
+
 		println pageTitle
 		println '\n[TOC]\n'
 
@@ -105,7 +109,6 @@ class JournalProject extends Project {
 		}
 	}
 
-
 	def addPageToMonth( JournalPage dayPage ) {
 		assert dayPage
 		if ( buildConfig.project.journal.pages.monthly.required ) {
@@ -133,6 +136,7 @@ class JournalProject extends Project {
 		final SimpleDateFormat fileNameFormat = dateFormatter( 'fileName' )
 		final def fileName   = fileNameFormat.format( pageDate ) + markdownFileType
 	}
+
 	def getYearFolder() {
 		dateFolder 'annual'
 	}
