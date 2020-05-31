@@ -48,7 +48,8 @@ class WeeklyProject extends JournalProject {
 		date - date.toZonedDateTime().dayOfWeek.value + 1 // Monday of target week
 	}
 
-	def createWeekPage ( final Date date ) {
+	@Override
+	def createPage( final Date date ) {
 
 		pageDate = startOfWeek( date )
 

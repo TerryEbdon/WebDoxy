@@ -250,7 +250,7 @@ class WebDoxy {
 				new WeeklyProject( projectName, buildConfig ).with {
 					numPagesWanted.times {
 						ant.echo "Generating page for ${pageDate}"
-						createWeekPage( pageDate )
+						createPage( pageDate )
 						pageDate += dateIncrement
 					}
 				}
