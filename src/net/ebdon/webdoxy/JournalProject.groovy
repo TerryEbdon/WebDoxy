@@ -26,7 +26,7 @@ import java.time.temporal.IsoFields;
 
 class JournalProject extends Project {
 
-	private Date pageDate = new Date();
+	Date pageDate = new Date();
 
 	JournalProject( projectName, buildConfig ) {
 		super( projectName, buildConfig )
@@ -50,38 +50,6 @@ class JournalProject extends Project {
 		startMonth == endMonth ? startMonth : "$startMonth / $endMonth"
 	}
 
-	String getPageTitle() {
-		final zonedDate = pageDate.toZonedDateTime()
-		final pageYear = zonedDate.get( IsoFields.WEEK_BASED_YEAR )
-		final pageWeek = zonedDate.get( IsoFields.WEEK_OF_WEEK_BASED_YEAR )
-		final Date sunday = pageDate + 6
-
-		ant.echo level: 'info',
-			"Creating weekly page title for year $pageYear, week $pageWeek"
-
-		final pageAnchor = "{#y${pageYear}_w${pageWeek}}"
-		"# ${monthTitle( pageDate, sunday )} -- $pageYear week $pageWeek $pageAnchor"
-	}
-
-	Date startOfWeek( final Date date ) {
-		date - date.toZonedDateTime().dayOfWeek.value + 1 // Monday of target week
-	}
-
-	def createWeekPage ( final Date date ) {
-
-		pageDate = startOfWeek( date )
-
-		println pageTitle
-		println '\n[TOC]\n'
-
-		final SimpleDateFormat pageDateFormat =
-			new SimpleDateFormat( '''## dd EEE {#'day'_yyyy_MM_dd}\n''' )
-			// new SimpleDateFormat( buildConfig.project.page.dateFormat )
-
-		7.times {
-			println pageDateFormat.format( pageDate++ )
-		}
-	}
 
 	def createPage( Date date ) {
 		pageDate = date

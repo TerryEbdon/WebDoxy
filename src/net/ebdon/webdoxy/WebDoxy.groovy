@@ -247,7 +247,7 @@ class WebDoxy {
 				"Generating $numPagesWanted journal pages with increment of $dateIncrement."
 
 			if ( numPagesWanted > 0 && numPagesWanted <= maxPages ) {
-				new JournalProject( projectName, buildConfig ).with {
+				new WeeklyProject( projectName, buildConfig ).with {
 					numPagesWanted.times {
 						ant.echo "Generating page for ${pageDate}"
 						createWeekPage( pageDate )
