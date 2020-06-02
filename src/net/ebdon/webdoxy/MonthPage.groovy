@@ -47,6 +47,12 @@ class MonthPage extends JournalPage {
 		append "${prefix}@subpage ${dayPage.pageAnchor}${suffix}"
 	}
 
+
+	def addDayPage() {
+    
+    // \todo implement addDayPage() 
+  }
+
 	def create() {
 		project.ant.echo level: 'debug', 'MonthPage.create() called'
 
