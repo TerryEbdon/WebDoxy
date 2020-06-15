@@ -1,5 +1,6 @@
 package net.ebdon.webdoxy;
 import java.text.SimpleDateFormat;
+import java.time.temporal.IsoFields;
 
 /**
  * @file
@@ -185,4 +186,36 @@ class JournalPage {
 		append closure.call()
 		append "@endhtmlonly"
 	}
+
+  def addSubPage( final JournalPage dayPage ) {
+    assert dayPage
+    project.ant.echo level: 'info', "Adding page ${dayPage.title} to page $title"
+
+    addPageLink dayPage, true
+  }
+
+  def addPageLink( final JournalPage dayPage, boolean subPage ) {
+    final prefix = project.buildConfig.project.journal.pages.monthly.linkPrefix
+    final suffix = project.buildConfig.project.journal.pages.monthly.linkSuffix
+    final String linkMethod = subPage ? 'subpage' : 'ref'
+
+    append "${prefix}@${linkMethod} ${dayPage.pageAnchor}${suffix}"
+  }
+
+  java.time.ZonedDateTime getZonedDate() {
+    project.pageDate.toZonedDateTime()
+  }
+
+  int getPageWeek() {
+    zonedDate.get( IsoFields.WEEK_OF_WEEK_BASED_YEAR )
+  }
+
+  def getPageQuarter() {
+    project.pageQuarter
+  }
+
+  def getPageYear() {
+    zonedDate.get( IsoFields.WEEK_BASED_YEAR )
+  }
+
 }

@@ -61,18 +61,7 @@ class WeeklyProject extends JournalProject {
 	}
 
 	String getQuarterFolder() {
-		// dateFolder 'quarter'
-		// println pageWeek.class.name()
 		"${pageYear}-q${pageQuarter}"
-	}
-
-	def getPageQuarter() {
-		final def quartersPerYear = 4
-		final def minWeeksPerQuarter = 13
-
-		new BigDecimal( pageWeek )
-			.divide( minWeeksPerQuarter, 0, BigDecimal.ROUND_UP )
-			.min( quartersPerYear )
 	}
 
 	@Override
@@ -102,11 +91,11 @@ class WeeklyProject extends JournalProject {
 		File pageFile = new File( fullPath )
 
 		if ( !pageFile.exists() ) {
-
 			def page = new WeekPage( this, pageFile )
-			
+
       page.create()
-			addPageToMonth page
+			addPageToQuarter  page
+			addPageToMonth    page, false
 		} else {
 			ant.echo level: 'warn',  message( 'JournalProject.nothingToDo' )
 			ant.echo level: 'debug', " --> ${pageFile.absolutePath}"
@@ -118,4 +107,23 @@ class WeeklyProject extends JournalProject {
     yearFolderPath
   }
 
+  def addPageToQuarter( JournalPage weekPage ) {
+    assert weekPage
+    if ( buildConfig.project.journal.pages.quarterly.required ) {
+      ant.echo "Quarterly pages ARE required"
+      final def fileName = "${pageYear}-q${pageQuarter}${markdownFileType}"
+
+      File file = new File( "${yearFolderPath}/${fileName}" )
+
+      QuarterPage quarterPage = new QuarterPage( this, file )
+      quarterPage.create()
+      if ( buildConfig.project.journal.pages.quarterly.addLinkToNewWeekPage ) {
+        ant.echo level: 'info', "Adding: $weekPage"
+        ant.echo level: 'info', "    to: $quarterPage"
+        quarterPage.addPageLink weekPage, true
+      }
+    } else {
+      ant.echo "Quarterly pages are NOT required"
+    }
+  }
 }

@@ -26,7 +26,7 @@ class MonthPage extends JournalPage {
 
 	MonthPage( JournalProject jp, File monthFile ) {
 		super( jp, monthFile )
-		project.ant.echo level: 'debug', 'MonthProject instantiated'
+		project.ant.echo level: 'debug', 'MonthPage instantiated'
 	}
 
 	def init() {
@@ -36,22 +36,6 @@ class MonthPage extends JournalPage {
 		anchorDate = anchorFormat.format( pageDate )
 		title      = titleformatter.format( pageDate )
 	}
-
-	def addSubPage( final JournalPage dayPage ) {
-		assert dayPage
-		project.ant.echo level: 'info', "Adding page ${dayPage.title} to month page $title"
-
-		final prefix = project.buildConfig.project.journal.pages.monthly.linkPrefix
-		final suffix = project.buildConfig.project.journal.pages.monthly.linkSuffix
-
-		append "${prefix}@subpage ${dayPage.pageAnchor}${suffix}"
-	}
-
-
-	def addDayPage() {
-    
-    // \todo implement addDayPage() 
-  }
 
 	def create() {
 		project.ant.echo level: 'debug', 'MonthPage.create() called'

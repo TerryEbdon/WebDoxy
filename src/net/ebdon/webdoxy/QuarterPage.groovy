@@ -23,14 +23,52 @@ package net.ebdon.webdoxy;
 
 class QuarterPage extends JournalPage {
 
-  @override
-	def create( Date date ) {
-    
-    // \todo implement createPage( date )
+  QuarterPage( JournalProject jp, File quarterFile ) {
+    super( jp, quarterFile )
+    project.ant.echo level: 'debug', 'QuarterPage instantiated'
   }
 
-	def addSubPage() {
-    
-    // \todo implement addSubPage() 
+  String getPageTitle() {
+    project.ant.echo level: 'info',
+      "Creating quarterly page title for year $pageYear, week $pageWeek"
+
+    "# $pageYear Q${pageQuarter} {#$pageAnchor}"
   }
+
+  @Override
+  def getPageAnchor() {
+    "y${pageYear}_q${pageQuarter}"
+  }
+
+  @Override
+  def getH1Anchor() {
+    pageAnchor
+  }
+
+  @Override
+  def create() {
+    project.ant.echo level: 'info', 'QuarterPge.create() called'
+
+    if ( exists() ) {
+      project.ant.echo level: 'info', project.message( 'QuarterPage.alreadyExists' )
+    } else {
+      super.create()
+    }
+  }
+
+  @Override
+  def createSkeletonHeader() {
+    append "${pageTitle}\n" // # 2020 Q1 25 {#y2020_q2}
+  }
+
+
+  @Override
+	def createSkeletonBody() {
+		;
+	}
+
+  @Override
+	def createSkeletonFooter() {
+		;
+	}
 }

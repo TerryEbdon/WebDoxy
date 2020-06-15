@@ -81,7 +81,7 @@ class JournalProject extends Project {
 		}
 	}
 
-	def addPageToMonth( JournalPage dayPage ) {
+	def addPageToMonth( JournalPage dayPage, boolean subPage = true ) {
 		assert dayPage
 		if ( buildConfig.project.journal.pages.monthly.required ) {
 			final def monthFmtStr = buildConfig.project.journal.pages.monthly.format
@@ -95,10 +95,19 @@ class JournalProject extends Project {
 			if ( buildConfig.project.journal.pages.monthly.addLinkToNewDayPage ) {
 				ant.echo level: 'info', "Adding: $dayPage"
 				ant.echo level: 'info', "    to: $monthPage"
-				monthPage.addSubPage dayPage
+				monthPage.addPageLink dayPage, subPage
 			}
 		}
 	}
+
+  def getPageQuarter() {
+    final def quartersPerYear = 4
+    final def minWeeksPerQuarter = 13
+
+    new BigDecimal( pageWeek )
+      .divide( minWeeksPerQuarter, 0, BigDecimal.ROUND_UP )
+      .min( quartersPerYear )
+  }
 
   def getMonthFolderPath() {
     "${yearFolderPath}${monthFolder}"

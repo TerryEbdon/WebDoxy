@@ -45,6 +45,10 @@ project {
 				linkPrefix          = '- '		// List of days.
 				linkSuffix          = ' -- <!-- add summary here -->'
 			}
+      quarterly {
+        required            = true
+        addLinkToNewWeekPage= true
+      }
 			annual {
 				required = false
 				format   = ''

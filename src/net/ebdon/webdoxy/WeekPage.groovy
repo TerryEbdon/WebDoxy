@@ -1,6 +1,5 @@
 package net.ebdon.webdoxy;
 
-import java.time.temporal.IsoFields;
 import java.text.SimpleDateFormat;
 
 /**
@@ -34,7 +33,6 @@ class WeekPage extends JournalPage {
   }
 
   String getPageTitle() {
-    final pageYear = zonedDate.get( IsoFields.WEEK_BASED_YEAR )
     final Date sunday = project.pageDate + 6
 
     project.ant.echo level: 'info',
@@ -42,14 +40,6 @@ class WeekPage extends JournalPage {
 
     pageAnchor = "y${pageYear}_w${pageWeek}"
     "# ${project.monthTitle( project.pageDate, sunday )} -- $pageYear week $pageWeek {#$pageAnchor}"
-  }
-
-  java.time.ZonedDateTime getZonedDate() {
-    project.pageDate.toZonedDateTime()
-  }
-
-  int getPageWeek() {
-    zonedDate.get( IsoFields.WEEK_OF_WEEK_BASED_YEAR )
   }
 
   @Override
