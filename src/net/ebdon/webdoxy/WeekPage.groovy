@@ -1,5 +1,8 @@
 package net.ebdon.webdoxy;
 
+import java.time.temporal.IsoFields;
+import java.text.SimpleDateFormat;
+
 /**
  * @file
  * @author  Terry Ebdon
@@ -23,10 +26,51 @@ package net.ebdon.webdoxy;
 
 class WeekPage extends JournalPage {
 
-  @override
-	def create( Date date ) {
+  String pageAnchor
 
-    // \todo implement createPage( date )
-
+  WeekPage( JournalProject jp, File file ) {
+    super( jp, file )
+    project.ant.echo level:'debug', "WeekPage instantiated."
   }
+
+  String getPageTitle() {
+    final pageYear = zonedDate.get( IsoFields.WEEK_BASED_YEAR )
+    final Date sunday = project.pageDate + 6
+
+    project.ant.echo level: 'info',
+      "Creating weekly page title for year $pageYear, week $pageWeek"
+
+    pageAnchor = "{#y${pageYear}_w${pageWeek}}"
+    "# ${project.monthTitle( project.pageDate, sunday )} -- $pageYear week $pageWeek $pageAnchor"
+  }
+
+  java.time.ZonedDateTime getZonedDate() {
+    project.pageDate.toZonedDateTime()
+  }
+
+  int getPageWeek() {
+    zonedDate.get( IsoFields.WEEK_OF_WEEK_BASED_YEAR )
+  }
+
+  @Override
+  def createSkeletonHeader() {
+    append "${pageTitle}\n\n[TOC]\n"
+  }
+
+  @Override
+  def createSkeletonBody() {
+    final SimpleDateFormat pageDateFormat =
+      new SimpleDateFormat( '''## dd EEE {#'day'_yyyy_MM_dd}\n''' )
+    Date dayInWeek = pageDate
+    7.times {
+      append pageDateFormat.format( dayInWeek++ )
+    }
+  }
+
+  @Override
+	def createSkeletonFooter() {
+		htmlOnly {
+			"<a class='btn' href='${pageAnchor}'>Top of page</a>"
+		}
+	}
 }

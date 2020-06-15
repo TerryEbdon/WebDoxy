@@ -50,12 +50,16 @@ class JournalProject extends Project {
 		startMonth == endMonth ? startMonth : "$startMonth / $endMonth"
 	}
 
+  String getFullFolderPath() {
+    "${monthFolderPath}${dayFolder}"
+  }
+
+  String getFullPath() {
+    "${fullFolderPath}${pageFileName}"
+  }
 
 	def createPage( Date date ) {
 		pageDate = date
-
-		final fullFolderPath = "${monthFolderPath}${dayFolder}"
-		final fullPath       = "${fullFolderPath}${pageFileName}"
 
 		ant.with {
 			echo level: 'debug', "fullFolderPath: $fullFolderPath"
@@ -96,9 +100,13 @@ class JournalProject extends Project {
 		}
 	}
 
-	def getMonthFolderPath() {
-		"${sourceFolder}/${yearFolder}${monthFolder}"
-	}
+  def getMonthFolderPath() {
+    "${yearFolderPath}${monthFolder}"
+  }
+
+  def getYearFolderPath() {
+    "${sourceFolder}/${yearFolder}"
+  }
 
 	def getPageFileName() {
 		final SimpleDateFormat fileNameFormat = dateFormatter( 'fileName' )

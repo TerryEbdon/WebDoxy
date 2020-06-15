@@ -31,10 +31,18 @@ class WeeklyProject extends JournalProject {
 		// final SimpleDateFormat anchorFormat = dateFormatter( 'anchor.day' )
 	}
 
+	java.time.ZonedDateTime getZonedDate() {
+		pageDate.toZonedDateTime()
+	}
+
+	int getPageWeek() {
+		zonedDate.get( IsoFields.WEEK_OF_WEEK_BASED_YEAR )
+	}
+
 	String getPageTitle() {
-		final zonedDate = pageDate.toZonedDateTime()
+		// final zonedDate = pageDate.toZonedDateTime()
 		final pageYear = zonedDate.get( IsoFields.WEEK_BASED_YEAR )
-		final pageWeek = zonedDate.get( IsoFields.WEEK_OF_WEEK_BASED_YEAR )
+		// final pageWeek = zonedDate.get( IsoFields.WEEK_OF_WEEK_BASED_YEAR )
 		final Date sunday = pageDate + 6
 
 		ant.echo level: 'info',
@@ -48,20 +56,61 @@ class WeeklyProject extends JournalProject {
 		date - date.toZonedDateTime().dayOfWeek.value + 1 // Monday of target week
 	}
 
+	def getPageYear() {
+		new SimpleDateFormat( 'yyyy' ).format( pageDate )
+	}
+
+	String getQuarterFolder() {
+		// dateFolder 'quarter'
+		// println pageWeek.class.name()
+		"${pageYear}-q${pageQuarter}"
+	}
+
+	def getPageQuarter() {
+		final def quartersPerYear = 4
+		final def minWeeksPerQuarter = 13
+
+		new BigDecimal( pageWeek )
+			.divide( minWeeksPerQuarter, 0, BigDecimal.ROUND_UP )
+			.min( quartersPerYear )
+	}
+
+	@Override
+	String getFullFolderPath() {
+		"${yearFolderPath}${quarterFolder}/"
+	}
+
+	@Override
+	def getPageFileName() {
+		final SimpleDateFormat fileNameFormat = dateFormatter( 'weekFileName' )
+		final def fileName   = fileNameFormat.format( pageDate ) + markdownFileType
+	}
+
 	@Override
 	def createPage( final Date date ) {
 
 		pageDate = startOfWeek( date )
 
-		println pageTitle
-		println '\n[TOC]\n'
+		ant.with {
+			echo level: 'info', "fullFolderPath: $fullFolderPath"
+			echo level: 'info', "Full path: $fullPath"
 
-		final SimpleDateFormat pageDateFormat =
-			new SimpleDateFormat( '''## dd EEE {#'day'_yyyy_MM_dd}\n''' )
-			// new SimpleDateFormat( buildConfig.project.page.dateFormat )
+			mkdir dir: fullFolderPath
+			echo level: 'info', "Creating page file: $fullPath"
+		}
 
-		7.times {
-			println pageDateFormat.format( pageDate++ )
+		File pageFile = new File( fullPath )
+
+		if ( !pageFile.exists() ) {
+
+			def page = new WeekPage( this, pageFile )
+			
+      page.create()
+
+			// addPageToMonth page
+		} else {
+			ant.echo level: 'warn',  message( 'JournalProject.nothingToDo' )
+			ant.echo level: 'debug', " --> ${pageFile.absolutePath}"
 		}
 	}
 }
