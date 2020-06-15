@@ -106,11 +106,16 @@ class WeeklyProject extends JournalProject {
 			def page = new WeekPage( this, pageFile )
 			
       page.create()
-
-			// addPageToMonth page
+			addPageToMonth page
 		} else {
 			ant.echo level: 'warn',  message( 'JournalProject.nothingToDo' )
 			ant.echo level: 'debug', " --> ${pageFile.absolutePath}"
 		}
 	}
+
+  @Override
+  def getMonthFolderPath() {
+    yearFolderPath
+  }
+
 }

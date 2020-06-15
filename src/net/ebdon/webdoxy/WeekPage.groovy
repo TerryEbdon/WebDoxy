@@ -40,8 +40,8 @@ class WeekPage extends JournalPage {
     project.ant.echo level: 'info',
       "Creating weekly page title for year $pageYear, week $pageWeek"
 
-    pageAnchor = "{#y${pageYear}_w${pageWeek}}"
-    "# ${project.monthTitle( project.pageDate, sunday )} -- $pageYear week $pageWeek $pageAnchor"
+    pageAnchor = "y${pageYear}_w${pageWeek}"
+    "# ${project.monthTitle( project.pageDate, sunday )} -- $pageYear week $pageWeek {#$pageAnchor}"
   }
 
   java.time.ZonedDateTime getZonedDate() {
@@ -68,9 +68,7 @@ class WeekPage extends JournalPage {
   }
 
   @Override
-	def createSkeletonFooter() {
-		htmlOnly {
-			"<a class='btn' href='${pageAnchor}'>Top of page</a>"
-		}
-	}
+  def getH1Anchor() {
+    pageAnchor
+  }
 }

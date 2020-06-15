@@ -31,6 +31,10 @@ class JournalPage {
 	private String anchorDate_; // final?
 	private String title_; // final?
 
+  String toString() {
+    "${title_}, ${h1Anchor}"
+  }
+
 	/**
 	 * @author Terry Ebdon
 	 * @date 23-JUN-2017
@@ -64,7 +68,7 @@ class JournalPage {
 	}
 
 	def getAnchorDate() {
-		project.ant.echo level:'debug', "getAnchorDate returning ${anchorDate_}"
+		// project.ant.echo level:'debug', "getAnchorDate returning ${anchorDate_}"
 		anchorDate_
 	}
 
