@@ -103,12 +103,12 @@ class WebDoxy {
 			def before = System.currentTimeMillis()
 			// WebDoxy build = new WebDoxy( options.arguments() )
 			WebDoxy build = new WebDoxy( options )
-			if (options.h) {
+			if (options.help) {
 				println "\n"
 				cli.usage()
 				return
 			}
-			if ( options.c ) {
+			if ( options.create ) {
 				build.create()
 			}
 			if ( options.journal ) {
@@ -117,17 +117,17 @@ class WebDoxy {
 			if ( options.week ) {
 				build.addWeeklyPage()
 			}
-			if ( options.g ) {
+			if ( options.generate ) {
 				build.generate()
 			}
-			if ( options.t ) {
+			if ( options.toc ) {
 				build.createToc()
 			}
-			if ( options.b ) {
+			if ( options.backup ) {
 				new Backup().run()
 			}
 
-			if ( options.s) {
+			if ( options.stub) {
 				if ( options.p ) {
 					build.stubs()
 				} else {
@@ -150,7 +150,7 @@ class WebDoxy {
 			ant.echo level: 'info', "Using config file: ${configFile.absolutePath}"
 			buildConfig = new ConfigSlurper().parse( configFile.toURI().toURL())
 
-			if ( options.p ) {
+			if ( options.project ) {
 				projects = [ options.project ]
 			} else {
 				projects = options.arguments() ?: buildConfig.defaultProjects
