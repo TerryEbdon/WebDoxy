@@ -46,8 +46,8 @@ project {
 				linkSuffix          = ' -- <!-- add summary here -->'
 			}
       quarterly {
-        required            = true
-        addLinkToNewWeekPage= true
+        required              = true
+        addLinkToNewWeekPage  = true
       }
 			annual {
 				required = false
@@ -59,23 +59,23 @@ project {
 		}
 
 		folders {
-			annually = true
+			annually  = true
 			quarterly = true
-			monthly	 = true
-			daily    = false
+			monthly	  = true
+			daily     = false
 		}
 		format {
-			annual      = 'YYYY'
-			quarter			= 'YYYY-QQQ'
-			month       = 'YYYY-MM'
-			day         = 'dd'
-			shorter     = 'dd-MMM-yyyy'
-			fileName    = 'yyyy-MM-dd'
-			weekFileName= "yyyy-'w'ww" // 2020-w18.md
-			longer      = 'EEEE d?? MMMM, yyyy'
-			anchorDay   = 'yyyyMMdd'
-			anchorMonth = 'yyyyMM'
-			longerMonth = "MMMM, YYYY"
+			annual        = 'YYYY'
+			quarter       = 'YYYY-QQQ'
+			month         = 'YYYY-MM'
+			day           = 'dd'
+			shorter       = 'dd-MMM-yyyy'
+			fileName      = 'yyyy-MM-dd'
+			weekFileName  = "yyyy-'w'ww" // 2020-w18.md
+			longer        = 'EEEE d?? MMMM, yyyy'
+			anchorDay     = 'yyyyMMdd'
+			anchorMonth   = 'yyyyMM'
+			longerMonth   = "MMMM, YYYY"
 		}
 	}
 }
