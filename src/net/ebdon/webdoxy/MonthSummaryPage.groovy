@@ -1,5 +1,7 @@
 package net.ebdon.webdoxy;
+
 import java.text.SimpleDateFormat;
+import java.time.temporal.IsoFields;
 
 /**
  * @file
@@ -23,6 +25,8 @@ import java.text.SimpleDateFormat;
  */
 
 class MonthSummaryPage extends JournalPage {
+
+  Date dayInMonth
 
   MonthSummaryPage( JournalProject jp, File monthFile ) {
     super( jp, monthFile )
@@ -49,17 +53,38 @@ class MonthSummaryPage extends JournalPage {
 
   @Override
   def createSkeletonBody() {
-    append '|       |       |'
-    append '|  ---: |  :--- |'
+    append '|     |       |       |'
+    append '| --: |  ---: |  :--- |'
 
     def pageDateFormat =
       new SimpleDateFormat( '''|[EEE dd](\\'ref' 'day'_yyyy_MM_dd) | |''' )
-    Date dayInMonth = new Date( pageDate.year, pageDate.month, 1 )
+    dayInMonth = new Date( pageDate.year, pageDate.month, 1 )
 
     1.upto( lastDateOfMonth ) { 
-      append pageDateFormat.format( dayInMonth++ )
+      append weekNumberColumn() + pageDateFormat.format( dayInMonth++ )
     }
   }
+
+  def weekNumberColumn() {
+    '|' + ( weekNumberNeeded ? weekNumber : ' ^' )
+  }
+
+  boolean isWeekNumberNeeded() {
+    dayInMonth.date == 1 || firstDayOfWeek
+  }
+
+  boolean isFirstDayOfWeek() {
+    dayInMonth.day == 1 
+  }
+
+	java.time.ZonedDateTime getZonedDate() {
+		dayInMonth.toZonedDateTime()
+	}
+
+	int getWeekNumber() {
+		zonedDate.get( IsoFields.WEEK_OF_WEEK_BASED_YEAR )
+	}
+
 
   int getLastDateOfMonth() {
     Calendar cal = Calendar.getInstance()
