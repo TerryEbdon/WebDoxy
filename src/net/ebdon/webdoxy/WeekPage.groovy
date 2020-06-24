@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat;
 
 class WeekPage extends JournalPage {
 
+  final String anchorDateFormat = ''''day'_yyyy_MM_dd'''
   String pageAnchor
 
   WeekPage( JournalProject jp, File file ) {
@@ -50,7 +51,7 @@ class WeekPage extends JournalPage {
   @Override
   def createSkeletonBody() {
     final SimpleDateFormat pageDateFormat =
-      new SimpleDateFormat( '''## dd EEE {#'day'_yyyy_MM_dd}\n''' )
+      new SimpleDateFormat( "## dd EEE {#${anchorDateFormat}}\n" )
     Date dayInWeek = pageDate
     7.times {
       append pageDateFormat.format( dayInWeek++ )
@@ -59,6 +60,6 @@ class WeekPage extends JournalPage {
 
   @Override
   def getH1Anchor() {
-    pageAnchor
+    new SimpleDateFormat( anchorDateFormat ).format( pageDate )
   }
 }
