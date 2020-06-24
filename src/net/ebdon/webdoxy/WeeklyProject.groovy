@@ -28,7 +28,6 @@ class WeeklyProject extends JournalProject {
 
 	WeeklyProject( projectName, buildConfig ) {
 		super( projectName, buildConfig )
-		// final SimpleDateFormat anchorFormat = dateFormatter( 'anchor.day' )
 	}
 
 	java.time.ZonedDateTime getZonedDate() {
@@ -40,9 +39,7 @@ class WeeklyProject extends JournalProject {
 	}
 
 	String getPageTitle() {
-		// final zonedDate = pageDate.toZonedDateTime()
 		final pageYear = zonedDate.get( IsoFields.WEEK_BASED_YEAR )
-		// final pageWeek = zonedDate.get( IsoFields.WEEK_OF_WEEK_BASED_YEAR )
 		final Date sunday = pageDate + 6
 
 		ant.echo level: 'info',
@@ -101,6 +98,24 @@ class WeeklyProject extends JournalProject {
 			ant.echo level: 'debug', " --> ${pageFile.absolutePath}"
 		}
 	}
+
+  @Override
+  def addPageToMonth( JournalPage weekPage, boolean subPage = true ) {
+    assert weekPage
+    if ( buildConfig.project.journal.pages.monthly.required ) {
+      ant.echo "****Monthly pages *ARE* required"
+
+      final def monthFmtStr = buildConfig.project.journal.pages.monthly.format
+      ant.echo level: 'info', "Month format string: ${monthFmtStr}"
+      final def SimpleDateFormat monthFormatter = new SimpleDateFormat( monthFmtStr ?: 'MMMM' )
+      final def monthFileName = monthFormatter.format( pageDate ) + markdownFileType
+      File monthFile = new File( "${monthFolderPath}/${monthFileName}" )
+
+      MonthSummaryPage monthSummaryPage = new MonthSummaryPage( this, monthFile )
+      monthSummaryPage.create()
+    }
+  }
+
 
   @Override
   def getMonthFolderPath() {
