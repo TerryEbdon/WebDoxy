@@ -50,12 +50,22 @@ class WeekPage extends JournalPage {
 
   @Override
   def createSkeletonBody() {
-    final SimpleDateFormat pageDateFormat =
-      new SimpleDateFormat( "## dd EEE {#${anchorDateFormat}}\n" )
+
     Date dayInWeek = pageDate
     7.times {
-      append pageDateFormat.format( dayInWeek++ )
+      append dayHeader( dayInWeek++ )
     }
+  }
+
+  String dayHeader( final Date dayInWeek) {
+    final SimpleDateFormat pageDateFormat1 =
+      new SimpleDateFormat( "## dd EEEE" )
+
+    final SimpleDateFormat pageDateFormat2 =
+      new SimpleDateFormat( "{#${anchorDateFormat}}\n" )
+
+    pageDateFormat1.format( dayInWeek ).padRight( 16 ) +
+    pageDateFormat2.format( dayInWeek )
   }
 
   @Override

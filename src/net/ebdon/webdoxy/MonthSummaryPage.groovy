@@ -96,13 +96,32 @@ class MonthSummaryPage extends JournalPage {
     return cal.getTime().date
   }
 
+  @Override
+  def createSkeletonHeader() {
+    append "# $title {#${pageAnchor}}\n"
+    append '\n[TOC]\n\n'
+    append "## $firstHeaderTitle {#${h1Anchor}}\n"
+  }
+
   def createSkeletonFooter() {
     ;
   }
 
+// 2020-04
+// @Override
+  // def getPageAnchor() {
+  //   "y${anchorDate}"
+  // }
+
+
   def getH1Anchor() {
     "h${anchorDate}"
   }
+
+  // @Override
+  // def getAnchorDate() {
+  //   "${pageYear}-" + ( "${pageMonth}".padLeft(2,'0') )
+  // }
 
   def getFirstHeaderTitleFormat() {
       project.dateFormatter( 'longerMonth' )

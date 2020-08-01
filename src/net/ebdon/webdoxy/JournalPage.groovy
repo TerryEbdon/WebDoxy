@@ -218,4 +218,8 @@ class JournalPage {
     zonedDate.get( IsoFields.WEEK_BASED_YEAR )
   }
 
+  int getPageMonth() {
+    project.pageDate.month + 1
+  }
+
 }
