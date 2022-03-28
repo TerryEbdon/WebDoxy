@@ -1,5 +1,6 @@
 package net.ebdon.webdoxy;
 
+import groovy.ant.AntBuilder          // AntBuilder has moved.
 /**
  * @file
  * @author	Terry Ebdon
@@ -80,7 +81,7 @@ class TocProject extends Project {
 				def projectName = file.parentFile.name
 				echo level: 'info', "Indexing project $projectName"
 				// tocFile << " - [${makeDisplayable( projectName)}](../$projectName/index.html)\n"
-				indexedProjects << " - [${makeDisplayable( projectName)}](../$projectName/index.html)\n"
+				indexedProjects << " - [${super.makeDisplayable( projectName)}](../$projectName/index.html)\n"
 			}
 
 			indexedProjects.sort { a, b ->
