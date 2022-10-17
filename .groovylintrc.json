@@ -1,0 +1,17 @@
+{
+    "extends": "recommended",
+    "rules": {
+        "Indentation": {
+            "enabled": false
+        },
+        "NoTabCharacter": {
+            "enabled": false
+        },
+        "SpaceInsideParentheses": {
+            "enabled": false
+        },
+        "UnnecessarySemicolon": {
+            "enabled": false
+        }
+    }
+}
