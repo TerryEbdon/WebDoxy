@@ -1,6 +1,7 @@
 package net.ebdon.webdoxy;
 import java.text.SimpleDateFormat;
-import groovy.ant.AntBuilder          // AntBuilder has moved.
+import groovy.ant.AntBuilder;         // AntBuilder has moved.
+import java.text.MessageFormat;
 
 /**
  * @file
@@ -64,10 +65,11 @@ class Project {
     }
   }
 
-  def message( key ) {
+  String message( final String msgId ) {
     loadBundle()
     try {
-      bundle.getString(key)
+      ant.echo level: 'debug', "Getting string for key $msgId without args"
+      bundle.getString( msgId )
     } catch ( java.util.MissingResourceException ex ) {
       ant.echo '.'
       ant.echo '---------------------------------------------'
@@ -75,10 +77,30 @@ class Project {
     }
   }
 
+  String message( final String msgId, Object[] msgArgs ) {
+    loadBundle()
+    String rawMsg
+    try {
+      ant.echo level: 'debug', "Getting string for key $msgId"
+      rawMsg = bundle.getString( msgId )
+      ant.echo level: 'debug', "Got string for key $msgId with args"
+    } catch ( java.util.MissingResourceException ex ) {
+      ant.echo '.'
+      ant.echo '---------------------------------------------'
+      ant.fail "Couldn't load resource / message: ${ex.message}"
+    }
+
+    MessageFormat formatter = new MessageFormat('')
+    ant.echo level: 'debug', "Got formatter for key $msgId"
+    formatter.locale = Locale.default
+    formatter.applyPattern( rawMsg )
+    ant.echo level: 'debug', "Formatting for key $msgId"
+    formatter.format( msgArgs )
+  }
 
   private void loadBundle() {
     try {
-      ant.echo level: 'debug', 'Checking resource bundle.'
+      ant.echo level: 'debug', "Checking resource bundle for project $name."
       if (!bundle) {
         ant.echo level: 'debug', 'Bundle not loaded yet... getting it.'
         bundle = ResourceBundle.getBundle( "resources.Language" )
