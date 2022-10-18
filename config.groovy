@@ -9,10 +9,16 @@ defaultProjects   = ['@Work-in-Progress']
 markdown.fileType = '.md'
 datePattern       =  'yyyy-MM-dd'
 backup {
-	excludesFile = "backupExcludes.txt"
+	excludesFile 	= 'backupExcludes.txt'
+	copyRoot			= 'b:/'
+	copyFolderRoot= "${copyRoot}Backups/projects/"
 }
 
 project {
+	author {
+		name = 'unknown uauthor'
+		page = '@ref AboutMe'
+	}
 	toc {
 		name             = 'TableOfContents'
 		brief            = 'Directory of known, documented, projects that have been built.'
@@ -36,9 +42,23 @@ project {
 		examples = [ 'static-html', 'include' ]
 	}
 
+	page {
+		dateFormat = 'dd-MMM-yyyy'
+		stub {
+			name = 'stub'
+			footer = '\\mycopyFooter'
+		}
+	}
+
 	journal {
 		pages {
+			useHtmlDateSuffix = true
+			daily {
+				htmlIncludes = [] //['DailyScript_1', 'DailyScript_2']
+			}
+
 			monthly {
+				htmlIncludes        = []      // [ 'ReverseMonthList.html' ]
 				required            = true
 				format              = 'YYYY-MM'
 				addLinkToNewDayPage = true
@@ -83,7 +103,8 @@ project {
 doxygen {
 	verbose        = true
 	configFileType = 'cfg'
-	folder         = 'c:/portable/Doxygen-1.8.13'
+	folder         = 'c:/portable/Doxygen-1.8.18'
+	//~ folder         = 'c:/portable/Doxygen' // 1.8.11
 	path           = "$folder/doxygen"
 
 	ant {
