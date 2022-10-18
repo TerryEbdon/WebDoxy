@@ -201,9 +201,11 @@ ruleset {
     ConsecutiveBlankLines
     FileEndsWithoutNewline
     Indentation {
-      spacesPerIndentLevel = 4
+      spacesPerIndentLevel = 2
     }
-    LineLength
+    LineLength {
+      length = 132
+    }
     MissingBlankLineAfterImports
     MissingBlankLineAfterPackage
     SpaceAfterCatch

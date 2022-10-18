@@ -24,50 +24,50 @@ import java.text.SimpleDateFormat;
 
 class MonthPage extends JournalPage {
 
-	MonthPage( JournalProject jp, File monthFile ) {
-		super( jp, monthFile )
-		project.ant.echo level: 'debug', 'MonthPage instantiated'
-	}
+  MonthPage( JournalProject jp, File monthFile ) {
+    super( jp, monthFile )
+    project.ant.echo level: 'debug', 'MonthPage instantiated'
+  }
 
-	def init() {
-		final SimpleDateFormat anchorFormat = project.dateFormatter( 'anchorMonth' ) ///@todo fix
-		final SimpleDateFormat titleformatter    = project.dateFormatter( 'month' ) ///@todo fix
+  def init() {
+    final SimpleDateFormat anchorFormat = project.dateFormatter( 'anchorMonth' ) ///@todo fix
+    final SimpleDateFormat titleformatter    = project.dateFormatter( 'month' ) ///@todo fix
 
-		anchorDate = anchorFormat.format( pageDate )
-		title      = titleformatter.format( pageDate )
-	}
+    anchorDate = anchorFormat.format( pageDate )
+    title      = titleformatter.format( pageDate )
+  }
 
-	def create() {
-		project.ant.echo level: 'debug', 'MonthPage.create() called'
+  def create() {
+    project.ant.echo level: 'debug', 'MonthPage.create() called'
 
-		if ( exists() ) {
-			project.ant.echo level: 'info', project.message( 'MonthPage.alreadyExists' )
-		} else {
-			super.create()
-		}
-	}
+    if ( exists() ) {
+      project.ant.echo level: 'info', project.message( 'MonthPage.alreadyExists' )
+    } else {
+      super.create()
+    }
+  }
 
-	def createSkeletonBody() {
-		;
-	}
+  def createSkeletonBody() {
+    ;
+  }
 
-	def createSkeletonFooter() {
-		;
-	}
+  def createSkeletonFooter() {
+    ;
+  }
 
-	def getHtmlFileNames() {
-		buildConfig.project.journal.pages.monthly.htmlIncludes
-	}
+  def getHtmlFileNames() {
+    buildConfig.project.journal.pages.monthly.htmlIncludes
+  }
 
-	def getH1Anchor() {
-		"h${anchorDate}"
-	}
+  def getH1Anchor() {
+    "h${anchorDate}"
+  }
 
-	def getFirstHeaderTitleFormat() {
-		 project.dateFormatter( 'longerMonth' )
-	}
+  def getFirstHeaderTitleFormat() {
+    project.dateFormatter( 'longerMonth' )
+  }
 
-	def addSuffix( final dateString ) {
-		dateString
-	}
+  def addSuffix( final dateString ) {
+    dateString
+  }
 }

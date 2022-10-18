@@ -3,8 +3,8 @@ package net.ebdon.webdoxy;
 import groovy.ant.AntBuilder          // AntBuilder has moved.
 /**
  * @file
- * @author	Terry Ebdon
- * @date	JUN-2017
+ * @author  Terry Ebdon
+ * @date    JUN-2017
  * @copyright
  *
  * Copyright 2017 Terry Ebdon
@@ -31,78 +31,78 @@ import groovy.ant.AntBuilder          // AntBuilder has moved.
 */
 class TocProject extends Project {
 
-	TocProject( buildConfig ) {
-		super( buildConfig.project.toc.name, buildConfig )
-	}
+  TocProject( buildConfig ) {
+    super( buildConfig.project.toc.name, buildConfig )
+  }
 
-	void create() {
-		deleteFile configFileName
-		super.create()
-	}
+  void create() {
+    deleteFile configFileName
+    super.create()
+  }
 
-	String getBrief() {
-		assert buildConfig
-		buildConfig.project.toc.brief
-	}
+  String getBrief() {
+    assert buildConfig
+    buildConfig.project.toc.brief
+  }
 
-	def getLatexRequired() {
-		"NO"
-	}
+  def getLatexRequired() {
+    "NO"
+  }
 
-	def getGenerateTreeView() {
-		buildConfig.project.toc.generateTreeView
-	}
+  def getGenerateTreeView() {
+    buildConfig.project.toc.generateTreeView
+  }
 
-	def getDisableIndex() {
-		buildConfig.project.toc.disableIndex
-	}
+  def getDisableIndex() {
+    buildConfig.project.toc.disableIndex
+  }
 
-	/**
-	 * Create main, index, page for the TOC project.
-	 * @author Terry Ebdon
-	 */
-	void createMainPage() {
-		assert ant
-		deleteFile mainMarkDownFileName
+  /**
+    * Create main, index, page for the TOC project.
+    * @author Terry Ebdon
+    */
+  void createMainPage() {
+    assert ant
+    deleteFile mainMarkDownFileName
 
-		File tocFile = new File( mainMarkDownFileName )
-		ant.with {
-			echo level: 'info', "Scanning folder tree: $htmlRootFolder"
-			def scanner = fileScanner {
-				fileset( dir: htmlRootFolder ) {
-					include( name: '**/index.html' )
-					exclude( name: "**/${buildConfig.project.toc.name}/index.html" )
-				}
-			}
+    File tocFile = new File( mainMarkDownFileName )
+    ant.with {
+      echo level: 'info', "Scanning folder tree: $htmlRootFolder"
+      def scanner = fileScanner {
+        fileset( dir: htmlRootFolder ) {
+          include( name: '**/index.html' )
+          exclude( name: "**/${buildConfig.project.toc.name}/index.html" )
+        }
+      }
 
-			def indexedProjects = [] // Alphanumeric order, but case sensitive.
-			tocFile << "# Known Projects {#mainpage}\n"
-			for ( file in scanner ) {
-				def projectName = file.parentFile.name
-				echo level: 'info', "Indexing project $projectName"
-				// tocFile << " - [${makeDisplayable( projectName)}](../$projectName/index.html)\n"
-				indexedProjects << " - [${super.makeDisplayable( projectName)}](../$projectName/index.html)\n"
-			}
+      def indexedProjects = [] // Alphanumeric order, but case sensitive.
+      tocFile << "# Known Projects {#mainpage}\n"
+      for ( file in scanner ) {
+        def projectName = file.parentFile.name
+        echo level: 'info', "Indexing project $projectName"
+        // tocFile << " - [${makeDisplayable( projectName)}](../$projectName/index.html)\n"
+        indexedProjects << " - [${super.makeDisplayable( projectName)}](../$projectName/index.html)\n"
+      }
 
-			indexedProjects.sort { a, b ->
-				a.compareToIgnoreCase b
-				// a <=> b
-			}.each {
-				tocFile << it
-			}
-		}
-	}
+      indexedProjects.sort { a, b ->
+        a.compareToIgnoreCase b
+        // a <=> b
+      }.each {
+        tocFile << it
+      }
+    }
+  }
 
-	/**
-	 * Wrapper for the ant delete task.
-	 * @param  filePath file to delete.
-	 * @return          Nothing.
-	 */
-	private void deleteFile( filePath ) {
-		File file = new File( filePath )
-		if ( file.exists() ) {
-			ant.echo level: 'warn', "Deleting file $filePath"
-			file.delete()
-		}
-	}
+  /**
+    * Wrapper for the ant delete task.
+    * @param  filePath file to delete.
+    * @return          Nothing.
+    */
+  private void deleteFile( filePath ) {
+    File file = new File( filePath )
+    if ( file.exists() ) {
+      ant.echo level: 'warn', "Deleting file $filePath"
+      file.delete()
+    }
+  }
 }

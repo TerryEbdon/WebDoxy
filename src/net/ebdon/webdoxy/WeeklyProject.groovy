@@ -5,8 +5,8 @@ import java.time.temporal.IsoFields;
 
 /**
  * @file
- * @author	Terry Ebdon
- * @date	JUN-2017
+ * @author  Terry Ebdon
+ * @date    JUN-2017
  * @copyright
  *
  * Copyright 2017 Terry Ebdon
@@ -26,78 +26,78 @@ import java.time.temporal.IsoFields;
 
 class WeeklyProject extends JournalProject {
 
-	WeeklyProject( projectName, buildConfig ) {
-		super( projectName, buildConfig )
-	}
+  WeeklyProject( projectName, buildConfig ) {
+    super( projectName, buildConfig )
+  }
 
-	java.time.ZonedDateTime getZonedDate() {
-		pageDate.toZonedDateTime()
-	}
+  java.time.ZonedDateTime getZonedDate() {
+    pageDate.toZonedDateTime()
+  }
 
-	int getPageWeek() {
-		zonedDate.get( IsoFields.WEEK_OF_WEEK_BASED_YEAR )
-	}
+  int getPageWeek() {
+    zonedDate.get( IsoFields.WEEK_OF_WEEK_BASED_YEAR )
+  }
 
-	String getPageTitle() {
-		final pageYear = zonedDate.get( IsoFields.WEEK_BASED_YEAR )
-		final Date sunday = pageDate + 6
+  String getPageTitle() {
+    final pageYear = zonedDate.get( IsoFields.WEEK_BASED_YEAR )
+    final Date sunday = pageDate + 6
 
-		ant.echo level: 'info',
-			"Creating weekly page title for year $pageYear, week $pageWeek"
+    ant.echo level: 'info',
+      "Creating weekly page title for year $pageYear, week $pageWeek"
 
-		final pageAnchor = "{#y${pageYear}_w${pageWeek}}"
-		"# ${monthTitle( pageDate, sunday )} -- $pageYear week $pageWeek $pageAnchor"
-	}
+    final pageAnchor = "{#y${pageYear}_w${pageWeek}}"
+    "# ${monthTitle( pageDate, sunday )} -- $pageYear week $pageWeek $pageAnchor"
+  }
 
-	Date startOfWeek( final Date date ) {
-		date - date.toZonedDateTime().dayOfWeek.value + 1 // Monday of target week
-	}
+  Date startOfWeek( final Date date ) {
+    date - date.toZonedDateTime().dayOfWeek.value + 1 // Monday of target week
+  }
 
-	def getPageYear() {
-		new SimpleDateFormat( 'yyyy' ).format( pageDate )
-	}
+  def getPageYear() {
+    new SimpleDateFormat( 'yyyy' ).format( pageDate )
+  }
 
-	String getQuarterFolder() {
-		"${pageYear}-q${pageQuarter}"
-	}
+  String getQuarterFolder() {
+    "${pageYear}-q${pageQuarter}"
+  }
 
-	@Override
-	String getFullFolderPath() {
-		"${yearFolderPath}${quarterFolder}/"
-	}
+  @Override
+  String getFullFolderPath() {
+    "${yearFolderPath}${quarterFolder}/"
+  }
 
-	@Override
-	def getPageFileName() {
-		final SimpleDateFormat fileNameFormat = dateFormatter( 'weekFileName' )
-		final def fileName   = fileNameFormat.format( pageDate ) + markdownFileType
-	}
+  @Override
+  def getPageFileName() {
+    final SimpleDateFormat fileNameFormat = dateFormatter( 'weekFileName' )
+    final def fileName   = fileNameFormat.format( pageDate ) + markdownFileType
+  }
 
-	@Override
-	def createPage( final Date date ) {
+  @Override
+  def createPage( final Date date ) {
 
-		pageDate = startOfWeek( date )
+    pageDate = startOfWeek( date )
 
-		ant.with {
-			echo level: 'info', "fullFolderPath: $fullFolderPath"
-			echo level: 'info', "Full path: $fullPath"
+    ant.with {
+      echo level: 'info', "fullFolderPath: $fullFolderPath"
+      echo level: 'info', "Full path: $fullPath"
 
-			mkdir dir: fullFolderPath
-			echo level: 'info', "Creating page file: $fullPath"
-		}
+      mkdir dir: fullFolderPath
+      echo level: 'info', "Creating page file: $fullPath"
+    }
 
-		File pageFile = new File( fullPath )
+    File pageFile = new File( fullPath )
 
-		if ( !pageFile.exists() ) {
-			def page = new WeekPage( this, pageFile )
+    if ( !pageFile.exists() ) {
+      def page = new WeekPage( this, pageFile )
 
       page.create()
-			addPageToQuarter  page
-			addPageToMonth    page, false
-		} else {
-			ant.echo level: 'warn',  message( 'JournalProject.nothingToDo' )
-			ant.echo level: 'debug', " --> ${pageFile.absolutePath}"
-		}
-	}
+      addPageToQuarter  page
+      addPageToMonth    page, false
+    } else {
+      ant.echo level: 'warn',  message( 'JournalProject.nothingToDo' )
+      ant.echo level: 'debug', " --> ${pageFile.absolutePath}"
+    }
+  }
 
   @Override
   def addPageToMonth( JournalPage weekPage, boolean subPage = true ) {
