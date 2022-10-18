@@ -37,6 +37,7 @@ class Backup {
 
   def config;
   def ant = new AntBuilder();
+  Project project;
 
   public static main( args ) {
     new Backup().run()
@@ -46,6 +47,7 @@ class Backup {
     config = new ConfigSlurper().
       parse( new File( 'config.groovy' ).
       toURI().toURL() )
+    project = new Project( 'backup', config )
   }
 
   public void run() {
@@ -77,10 +79,15 @@ class Backup {
           mkdir dir: backupCopyFolder
           copy file: zipFile, todir: backupCopyFolder
         } else {
-          echo level: 'warn', "Backup drive $backupCopyRoot is off-line!"
+          fail(
+            this.project.message(
+              'backup.copyDriveOffline',
+              [backupCopyRoot] as Object[]
+            )
+          )
         }
       } else {
-        echo level: 'warn', "Backup skipped, as zip already exists"
+        echo level: 'warn', this.project.message( 'backup.alreadyExists' )
       }
     }
   }
