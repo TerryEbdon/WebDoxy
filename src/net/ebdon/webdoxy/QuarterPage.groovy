@@ -63,12 +63,12 @@ class QuarterPage extends JournalPage {
 
 
   @Override
-	def createSkeletonBody() {
-		;
-	}
+  def createSkeletonBody() {
+    ;
+  }
 
   @Override
-	def createSkeletonFooter() {
-		;
-	}
+  def createSkeletonFooter() {
+    ;
+  }
 }

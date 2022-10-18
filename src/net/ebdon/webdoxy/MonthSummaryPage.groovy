@@ -77,13 +77,13 @@ class MonthSummaryPage extends JournalPage {
     dayInMonth.day == 1 
   }
 
-	java.time.ZonedDateTime getZonedDate() {
-		dayInMonth.toZonedDateTime()
-	}
+  java.time.ZonedDateTime getZonedDate() {
+    dayInMonth.toZonedDateTime()
+  }
 
-	int getWeekNumber() {
-		zonedDate.get( IsoFields.WEEK_OF_WEEK_BASED_YEAR )
-	}
+  int getWeekNumber() {
+    zonedDate.get( IsoFields.WEEK_OF_WEEK_BASED_YEAR )
+  }
 
 
   int getLastDateOfMonth() {
@@ -124,7 +124,7 @@ class MonthSummaryPage extends JournalPage {
   // }
 
   def getFirstHeaderTitleFormat() {
-      project.dateFormatter( 'longerMonth' )
+    project.dateFormatter( 'longerMonth' )
   }
 
   def addSuffix( final dateString ) {

@@ -3,8 +3,8 @@ package net.ebdon.webdoxy;
 import groovy.ant.AntBuilder          // AntBuilder has moved.
 /**
  * @file
- * @author	Terry Ebdon
- * @date	JUN-2017
+ * @author  Terry Ebdon
+ * @date    JUN-2017
  * @copyright
  *
  * Copyright 2017 Terry Ebdon
@@ -23,56 +23,56 @@ import groovy.ant.AntBuilder          // AntBuilder has moved.
  */
 
 class ProjectConfigFile {
-	final Project project;
-	File configFile;
-	AntBuilder ant;
+  final Project project;
+  File configFile;
+  AntBuilder ant;
 
-	ProjectConfigFile( Project p ) {
-		assert p
-		assert p.ant
+  ProjectConfigFile( Project p ) {
+    assert p
+    assert p.ant
 
-		project = p
-		ant = project.ant
-	}
+    project = p
+    ant = project.ant
+  }
 
-	void create() {
-		configFile = new File( project.configFileName )
-		if ( !configFile.exists() ) {
-			ant.echo level: 'debug', "Creating configuration file ${project.configFileName}"
-			project.with {
-				set '@INCLUDE',			buildConfig.project.baseDoxyFile
-				set 'PROJECT_NAME',		name
-				set 'PROJECT_BRIEF',	"\"${brief}\""
-				set 'INPUT',			sourceFolder
-				set 'DIAFILE_DIRS',		diaFolder
-				set 'ENABLED_SECTIONS',	name
+  void create() {
+    configFile = new File( project.configFileName )
+    if ( !configFile.exists() ) {
+      ant.echo level: 'debug', "Creating configuration file ${project.configFileName}"
+      project.with {
+        set '@INCLUDE',         buildConfig.project.baseDoxyFile
+        set 'PROJECT_NAME',     name
+        set 'PROJECT_BRIEF',    "\"${brief}\""
+        set 'INPUT',            sourceFolder
+        set 'DIAFILE_DIRS',     diaFolder
+        set 'ENABLED_SECTIONS', name
 
-				set 'OUTPUT_DIRECTORY',	outRoot
-				set 'HTML_OUTPUT',		"${buildConfig.project.parentfolders.html}/$name"
-				set 'LATEX_OUTPUT',		"${buildConfig.project.parentfolders.latex}/$name"
-				add 'IMAGE_PATH',		imageFolder
+        set 'OUTPUT_DIRECTORY', outRoot
+        set 'HTML_OUTPUT',      "${buildConfig.project.parentfolders.html}/$name"
+        set 'LATEX_OUTPUT',     "${buildConfig.project.parentfolders.latex}/$name"
+        add 'IMAGE_PATH',       imageFolder
 
-				set 'GENERATE_HTML',	htmlRequired
-				set 'GENERATE_LATEX',	latexRequired
-				set 'DISABLE_INDEX',	disableIndex
-				set 'GENERATE_TREEVIEW',generateTreeView
+        set 'GENERATE_HTML',    htmlRequired
+        set 'GENERATE_LATEX',   latexRequired
+        set 'DISABLE_INDEX',    disableIndex
+        set 'GENERATE_TREEVIEW',generateTreeView
 
-				exampleFolders.each { ef ->
-					add 'EXAMPLE_PATH', "$rootFolder/$ef"
-				}
-			}
-		} else {
-			ant.echo level: 'warn', "Configuration file for project ${project.name} already exists."
-		}
-	}
+        exampleFolders.each { ef ->
+          add 'EXAMPLE_PATH', "$rootFolder/$ef"
+        }
+      }
+    } else {
+      ant.echo level: 'warn', "Configuration file for project ${project.name} already exists."
+    }
+  }
 
-	void set( key, value ) {
-		assert configFile
-		configFile << "${key.padRight( 25 )} = ${value}\n"
-	}
+  void set( key, value ) {
+    assert configFile
+    configFile << "${key.padRight( 25 )} = ${value}\n"
+  }
 
-	void add( key, value ) {
-		assert configFile
-		configFile << "${key.padRight( 24 )} += ${value}\n"
-	}
+  void add( key, value ) {
+    assert configFile
+    configFile << "${key.padRight( 24 )} += ${value}\n"
+  }
 }

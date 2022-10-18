@@ -3,8 +3,8 @@ package net.ebdon.webdoxy;
 import groovy.ant.AntBuilder          // AntBuilder has moved.
 /**
  * @file
- * @author	Terry Ebdon
- * @date		June 2017
+ * @author  Terry Ebdon
+ * @date    June 2017
  * @copyright
  *
  * Copyright 2017 Terry Ebdon
@@ -35,53 +35,53 @@ import groovy.ant.AntBuilder          // AntBuilder has moved.
 */
 class Backup {
 
-	def config;
-	def ant = new AntBuilder();
+  def config;
+  def ant = new AntBuilder();
 
-	public static main( args ) {
-		new Backup().run()
-	}
+  public static main( args ) {
+    new Backup().run()
+  }
 
-	Backup() {
-		config = new ConfigSlurper().
-			parse( new File( 'config.groovy' ).
-			toURI().toURL() )
-	}
+  Backup() {
+    config = new ConfigSlurper().
+      parse( new File( 'config.groovy' ).
+      toURI().toURL() )
+  }
 
-	public void run() {
-		ant.with {
-			final String backupTimestamp    	= new Date().format('yyyy-MM-dd_HHmm')
-			final String backupFolderSuffix 	= "${new Date().format('yyyy/yyyy-MM')}"
-			final String backupFolder       	= "backup/$backupFolderSuffix"
-			final String backupCopyRoot     	= config.backup.copyRoot
-			final String backupCopyFolderRoot = config.backup.copyFolderRoot
-			echo level: 'debug', "Timestamp:\t $backupTimestamp"
-			echo level: 'debug', "Folder:\t $backupFolder"
-			mkdir dir: backupFolder
+  public void run() {
+    ant.with {
+      final String backupTimestamp      = new Date().format('yyyy-MM-dd_HHmm')
+      final String backupFolderSuffix   = "${new Date().format('yyyy/yyyy-MM')}"
+      final String backupFolder         = "backup/$backupFolderSuffix"
+      final String backupCopyRoot       = config.backup.copyRoot
+      final String backupCopyFolderRoot = config.backup.copyFolderRoot
+      echo level: 'debug', "Timestamp:\t $backupTimestamp"
+      echo level: 'debug', "Folder:\t $backupFolder"
+      mkdir dir: backupFolder
 
-			def pathBits = new File('.').absolutePath.split('\\\\')
-			assert pathBits.length > 1
-			final String baseDir = pathBits[ pathBits.length == 2 ? -1 : -2 ]
-			String zipFile = "$backupFolder/${backupTimestamp}_${baseDir}.zip"
-			echo level: 'debug', zipFile
-			if ( !new File( zipFile ).exists() ) {
-				zip( destfile: zipFile ) {
-					fileset(
-						dir: '.',
-						excludesfile: config.backup.excludesFile
-					)
-				}
-				if ( new File( backupCopyRoot ).exists() ) {
-					final String backupCopyFolder = backupCopyFolderRoot +
-							baseDir + '/' + backupFolderSuffix
-					mkdir dir: backupCopyFolder
-					copy file: zipFile, todir: backupCopyFolder
-				} else {
-					echo level: 'warn', "Backup drive $backupCopyRoot is off-line!"
-				}
-			} else {
-				echo level: 'warn', "Backup skipped, as zip already exists"
-			}
-		}
-	}
+      def pathBits = new File('.').absolutePath.split('\\\\')
+      assert pathBits.length > 1
+      final String baseDir = pathBits[ pathBits.length == 2 ? -1 : -2 ]
+      String zipFile = "$backupFolder/${backupTimestamp}_${baseDir}.zip"
+      echo level: 'debug', zipFile
+      if ( !new File( zipFile ).exists() ) {
+        zip( destfile: zipFile ) {
+          fileset(
+            dir: '.',
+            excludesfile: config.backup.excludesFile
+          )
+        }
+        if ( new File( backupCopyRoot ).exists() ) {
+          final String backupCopyFolder = backupCopyFolderRoot +
+              baseDir + '/' + backupFolderSuffix
+          mkdir dir: backupCopyFolder
+          copy file: zipFile, todir: backupCopyFolder
+        } else {
+          echo level: 'warn', "Backup drive $backupCopyRoot is off-line!"
+        }
+      } else {
+        echo level: 'warn', "Backup skipped, as zip already exists"
+      }
+    }
+  }
 }
