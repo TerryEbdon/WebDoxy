@@ -80,21 +80,23 @@ class WebDoxy {
 
   public static main( args ) {
     ant.echo level: 'info', "args: $args"
-    def cli = new CliBuilder(usage: 'Build -[bcdghjntv] [project-name]*')
+
+    Resource resource = new Resource()
+    def cli = new CliBuilder(usage: resource.message('help.usage') )
 
     cli.with {
-      h args: 0, longOpt: 'help',                   'Show usage information'
-      c args: 0, longOpt: 'create',                 'Create configuration file and source folders for project(s)'
-      g args: 0, longOpt: 'generate',               'Generate web site(s) for project(s)'
-      b args: 0, longOpt: 'backup',                 'Backup configuration & source files for all projects'
-      v args: 0, longOpt: 'validate',               'Run a validation check on the specified projects'
-      t args: 0, longOpt: 'toc',                    'Create a table of contents page, referencing all configured projects'
-      j args: 0, longOpt: 'journal',                'Create a daily diary entry'
-      d args: 1, longOpt: 'date',                   'Optional date for journal entry. Today if not specified'
-      n args: 1, longOpt: 'number', type: Integer,  'number of days to generate'
-      p args: 1, longOpt: 'project',                'project name, for stubs command'
-      s args: 0, longOpt: 'stub',                   'generate stub files for given project'
-      w args: 0, longOpt: 'week',                   'Create weekly diary page'
+      h args: 0, longOpt: 'help',                   resource.message( 'help.help' )
+      c args: 0, longOpt: 'create',                 resource.message( 'help.create' )
+      g args: 0, longOpt: 'generate',               resource.message( 'help.generate' )
+      b args: 0, longOpt: 'backup',                 resource.message( 'help.backup' )
+      v args: 0, longOpt: 'validate',               resource.message( 'help.validate' )
+      t args: 0, longOpt: 'toc',                    resource.message( 'help.toc' )
+      j args: 0, longOpt: 'journal',                resource.message( 'help.journal' )
+      d args: 1, longOpt: 'date',                   resource.message( 'help.date' )
+      n args: 1, longOpt: 'number', type: Integer,  resource.message( 'help.number' )
+      p args: 1, longOpt: 'project',                resource.message( 'help.project' )
+      s args: 0, longOpt: 'stub',                   resource.message( 'help.stub' )
+      w args: 0, longOpt: 'week',                   resource.message( 'help.week' )
     }
 
     def options = cli.parse(args)

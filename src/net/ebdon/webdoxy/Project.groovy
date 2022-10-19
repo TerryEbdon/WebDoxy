@@ -25,8 +25,8 @@ import java.text.MessageFormat;
  */
 
 /**
- @brief Class that generates a Doxygen project.
- @author Terry Ebdon
+ @brief   Class that generates a Doxygen project.
+ @author  Terry Ebdon
 
  @todo Move all string constants into config.groovy
  @todo Move all message strings into Language.properties
@@ -114,6 +114,7 @@ class Project {
     }
     ant.echo level: 'debug', "Resource bundle looks good."
   }
+
   private void createConfigFile() {
     new ProjectConfigFile( this ).create()
   }
