@@ -22,7 +22,6 @@ import groovy.ant.AntBuilder          // AntBuilder has moved.
  * limitations under the License.
  */
 
-
 /**
 @brief Groovy script to backup the web-doxy folder.
 @author Terry Ebdon
@@ -73,6 +72,7 @@ class Backup {
             excludesfile: config.backup.excludesFile
           )
         }
+
         if ( new File( backupCopyRoot ).exists() ) {
           final String backupCopyFolder = backupCopyFolderRoot +
               baseDir + '/' + backupFolderSuffix
@@ -80,14 +80,16 @@ class Backup {
           copy file: zipFile, todir: backupCopyFolder
         } else {
           fail(
-            this.project.message(
+            new Resource().message(
               'backup.copyDriveOffline',
               [backupCopyRoot] as Object[]
             )
           )
         }
       } else {
-        echo level: 'warn', this.project.message( 'backup.alreadyExists' )
+        new Resource().with {
+          echo level: msgWarn, message( 'backup.alreadyExists' )
+        }
       }
     }
   }

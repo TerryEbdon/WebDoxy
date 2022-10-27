@@ -77,27 +77,6 @@ class Project {
     }
   }
 
-  String message( final String msgId, Object[] msgArgs ) {
-    loadBundle()
-    String rawMsg
-    try {
-      ant.echo level: 'debug', "Getting string for key $msgId"
-      rawMsg = bundle.getString( msgId )
-      ant.echo level: 'debug', "Got string for key $msgId with args"
-    } catch ( java.util.MissingResourceException ex ) {
-      ant.echo '.'
-      ant.echo '---------------------------------------------'
-      ant.fail "Couldn't load resource / message: ${ex.message}"
-    }
-
-    MessageFormat formatter = new MessageFormat('')
-    ant.echo level: 'debug', "Got formatter for key $msgId"
-    formatter.locale = Locale.default
-    formatter.applyPattern( rawMsg )
-    ant.echo level: 'debug', "Formatting for key $msgId"
-    formatter.format( msgArgs )
-  }
-
   private void loadBundle() {
     try {
       ant.echo level: 'debug', "Checking resource bundle for project $name."
