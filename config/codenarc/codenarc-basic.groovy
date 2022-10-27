@@ -110,7 +110,7 @@ ruleset {
     HashtableIsObsolete
     IfStatementCouldBeTernary
     InvertedCondition
-    InvertedIfElse
+    // InvertedIfElse
     LongLiteralWithLowerCaseL
     MethodParameterTypeRequired
     MethodReturnTypeRequired

@@ -177,7 +177,12 @@ class JournalPage {
       case 24..29:    "th"; break
       case 30:        "th"; break
       default:
-        project.ant.fail "Unexpected day No. ${d.date}"
+        project.ant.fail (
+          new Resource().message(
+            'journalPage.badDayNum',
+            [d.date] as Object[]
+          )
+        )
   }
 }
 

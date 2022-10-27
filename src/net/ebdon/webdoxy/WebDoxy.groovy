@@ -72,6 +72,13 @@ For each configured site (live, staged, draft...)
 
 class WebDoxy {
   static final defaultConfigs = [ 'live', 'staged' ];
+  static Resource resource = new Resource();
+
+  // static final String msgDebug = 'debug';
+  // static final String msgInfo  = 'info';
+  // static final String msgWarn  = 'warn';
+  // static final String msgError = 'error';
+
   def projects = []; ///< List of projects that the commansd(s) will apply to
   Boolean doxygenInitialised = false;
   def buildConfig;
@@ -104,8 +111,8 @@ class WebDoxy {
     if (options) {
       ant.echo level: 'info', "Working..."
       def before = System.currentTimeMillis()
-      // WebDoxy build = new WebDoxy( options.arguments() )
       WebDoxy build = new WebDoxy( options )
+
       if (options.help) {
         println "\n"
         cli.usage()
@@ -134,7 +141,7 @@ class WebDoxy {
         if ( options.p ) {
           build.stubs()
         } else {
-          ant.fail "No project name provided."
+          ant.fail resource.message( 'webDoxy.noProjectName' )
         }
       }
 
@@ -162,8 +169,12 @@ class WebDoxy {
       cliOptions = options
       initDoxygen()
     } else {
-      ant.echo level: 'error', "Current folder: ${configFile.absolutePath}"
-      ant.fail "Can't find configuration file: $configFileName"
+      ant.fail(
+        resource.message(
+          'webDoxy.noConfigFile',
+          [configFile.absolutePath] as Object[]
+        )
+      )
     }
   }
 
@@ -198,6 +209,7 @@ class WebDoxy {
 
       int numPagesWanted = cliOptions.number ?: 1
       ant.echo level: 'info', "Generating $numPagesWanted journal pages."
+      ant.echo level: Resource.msgInfo, "Max pages allowed: $maxPages"
 
       if ( numPagesWanted > 0 && numPagesWanted <= maxPages ) {
         new JournalProject( projectName, buildConfig ).with {
@@ -207,7 +219,12 @@ class WebDoxy {
           }
         }
       } else {
-        ant.fail( "Number $numPagesWanted is outside expected range of 1..$maxPages" )
+        ant.fail(
+          new Resource().message(
+            'webDoxy.badNumPages',
+            [numPagesWanted,maxPages] as Object[]
+          )
+        )
       }
     }
   }
@@ -258,7 +275,12 @@ class WebDoxy {
           }
         }
       } else {
-        ant.fail( "Number $numPagesWanted is outside expected range of 1..${maxPages}" )
+        ant.fail(
+          new Resource().message(
+            'webDoxy.badNumPages',
+            [numPagesWanted,maxPages] as Object[]
+          )
+        )
       }
     }
   }
@@ -341,6 +363,7 @@ class WebDoxy {
   /// @todo also check for the \@page variant.
   void validateMarkDown() {
     ant.with {
+      echo level: Resource.msgInfo, resource.message( 'webDoxy.validateMarkDown' )
       def scanner = fileScanner {
         fileset( dir: '.' ) {
           include( name: "**/*.md" )
@@ -353,6 +376,7 @@ class WebDoxy {
 
       int badPages = 0
       for (file in scanner) {
+        ant.echo level: Resource.msgDebug, "Checking file: $file"
         file.eachLine { line, num ->
           if ( line ==~ /\\page(\s+\w+){0,1}/ ) {
             ++badPages
@@ -362,7 +386,12 @@ class WebDoxy {
       }
 
       if ( badPages ) {
-        fail "$badPages bad page directives found."
+        fail(
+          resource.message(
+            'webDoxy.badPageDirective',
+            [badPages] as Object[]
+          )
+        )
       }
     }
   }
