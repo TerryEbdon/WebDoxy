@@ -1,7 +1,6 @@
 package net.ebdon.webdoxy;
 import java.text.SimpleDateFormat;
 import groovy.ant.AntBuilder;         // AntBuilder has moved.
-import java.text.MessageFormat;
 
 /**
  * @file
@@ -34,8 +33,8 @@ import java.text.MessageFormat;
 class Project {
   final String name;
   final def buildConfig;  //!< @see config.groovy
-  ResourceBundle bundle;
-  AntBuilder ant;
+  final Resource resource = new Resource();
+  final AntBuilder ant;
 
   Project( String pn, bc ) {
     assert pn.length()
@@ -63,35 +62,6 @@ class Project {
       ant.echo level: 'debug', "Creating example folder: $ef"
       ant.mkdir dir: "$rootFolder/$ef"
     }
-  }
-
-  String message( final String msgId ) {
-    loadBundle()
-    try {
-      ant.echo level: 'debug', "Getting string for key $msgId without args"
-      bundle.getString( msgId )
-    } catch ( java.util.MissingResourceException ex ) {
-      ant.echo '.'
-      ant.echo '---------------------------------------------'
-      ant.fail "Couldn't load resource / message: ${ex.message}"
-    }
-  }
-
-  private void loadBundle() {
-    try {
-      ant.echo level: 'debug', "Checking resource bundle for project $name."
-      if (!bundle) {
-        ant.echo level: 'debug', 'Bundle not loaded yet... getting it.'
-        bundle = ResourceBundle.getBundle( "resources.Language" )
-      } else {
-        ant.echo level: 'debug', "Nothing to do.. resource bundle was already loaded."
-      }
-    } catch ( java.util.MissingResourceException ex ) {
-      ant.echo '.'
-      ant.echo '---------------------------------------------'
-      ant.fail "Failed to load resource bundle: ${ex.message}"
-    }
-    ant.echo level: 'debug', "Resource bundle looks good."
   }
 
   private void createConfigFile() {
@@ -158,20 +128,30 @@ class Project {
   }
 
   void createStub( final pageName ) {
-    ant.echo level: 'info', "Creating stub page $pageName for project $name"
+    final Object[] msgArgs = [pageName, name] as Object[]
+
     File pageFile = new File( markDownFileName( pageName ) )
     if ( !pageFile.exists() ) {
+      ant.echo(
+        level: Resource.msgWarn,
+        resource.message( 'project.stub.creatingPage', msgArgs )
+      )
       pageFile << "\\page $pageName $pageName\n"
       pageFile << "[TOC]\n"
       pageFile << "\\date ${pageDate}\n"
       pageFile << "\\author ${author.name}\n"
-      pageFile << "\\todo Replace this \\ref ${stubListPageName} with\n"
-      pageFile << "useful $pageName documentation.\n"
-      pageFile << "\n${buildConfig.project.page.stub.footer}\n"
+
+      pageFile << '\n\\todo ' << resource.message(
+        'project.stub.creatingToDo',
+        [stubListPageName, pageName] as Object[]
+      ) << '\n\n'
+      pageFile << buildConfig.project.page.stub.footer << '\n'
       addToStubList pageName
     } else {
-      ant.echo level: 'warn',
-        "Page $pageName already exists for project $name"
+      ant.echo(
+        level: Resource.msgWarn,
+        resource.message( 'project.stub.pageAlreadyExists', msgArgs )
+      )
     }
   }
 
