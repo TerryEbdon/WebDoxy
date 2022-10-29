@@ -2,6 +2,7 @@ package net.ebdon.webdoxy;
 
 import java.time.temporal.IsoFields;
 import groovy.ant.AntBuilder          // AntBuilder has moved.
+import org.codehaus.groovy.ant.FileScanner
 import groovy.cli.commons.CliBuilder  // CliBuilder has moved.
 /**
  * @file
@@ -344,7 +345,7 @@ class WebDoxy {
 
   void buildProject( projectName ) {
     Project project = new Project( projectName, buildConfig )
-    def before = System.currentTimeMillis()
+    final BigDecimal before = System.currentTimeMillis()
     ant.echo level: 'info', "Building project: $project"
     project.cleanOutputFolders()
 
@@ -355,17 +356,43 @@ class WebDoxy {
       //property( name: 'PROJECT_NAME', value: "$config Portfolio" )
       //property( name: 'ENABLED_SECTIONS', value: config )
     }
-    def after = System.currentTimeMillis()
-    ant.echo "Project built in ${(after-before)/1000} seconds"
+
+    final BigDecimal after          = System.currentTimeMillis()
+    final BigDecimal runTimeSeconds = (after - before) / 1000
+
+    ant.echo level: Resource.msgInfo,
+        resource.message(
+          'webDoxy.buildProject.done',
+          [projectName, runTimeSeconds] as Object[]
+        )
+  }
+
+  void validateMarkDown() {
+    ant.echo level: Resource.msgInfo,
+      resource.message(
+        'webDoxy.validateMarkDown',
+        [projects.toString()] as Object[]
+      )
+
+    projects.each { projectName ->
+      validateMarkDownProject( projectName )
+    }
   }
 
   /// Check for bad \\page directives in markdown files.
   /// @todo also check for the \@page variant.
-  void validateMarkDown() {
+  void validateMarkDownProject( final String projectName ) {
+    final Project project = new Project( projectName, buildConfig )
+
     ant.with {
-      echo level: Resource.msgInfo, resource.message( 'webDoxy.validateMarkDown' )
-      def scanner = fileScanner {
-        fileset( dir: '.' ) {
+      echo level: Resource.msgInfo,
+        resource.message(
+          'webDoxy.validateMarkDownProject',
+          [project.name] as Object[]
+        )
+
+      FileScanner scanner = fileScanner {
+        fileset( dir: project.rootFolder ) {
           include( name: "**/*.md" )
               /// @note ^^ double quotes, not single, as otherwise
               /// Doxygen thinks the regex starts a comment block.
