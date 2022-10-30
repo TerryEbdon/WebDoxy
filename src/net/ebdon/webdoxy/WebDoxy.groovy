@@ -128,6 +128,11 @@ class WebDoxy {
       if ( options.week ) {
         build.addWeeklyPage()
       }
+
+      if ( options.validate ) { // before generate, to guarantee warning appears
+        build.validate()
+      }
+
       if ( options.generate ) {
         build.generate()
       }
@@ -187,6 +192,16 @@ class WebDoxy {
     //~ // assert dotProperty.length() > 5
     //~ assert new File(dotProperty).exists()
     //~ assert "dot -?".execute().text.contains('Usage: dot')
+  }
+
+  final void validate() {
+    if ( !cliOptions.generate ) {
+      validateMarkDown()
+    } else {
+      ant.echo level: Resource.msgWarn, 
+        resource.message( 'webDoxy.validateSuperfluous' )
+          //> Assumes validate is called before generate
+    }
   }
 
   void stubs() {
