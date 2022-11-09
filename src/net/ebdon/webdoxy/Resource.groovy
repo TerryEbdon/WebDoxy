@@ -35,8 +35,8 @@ class Resource {
   static final String msgWarn  = 'warn';
   static final String msgError = 'error';
 
-  private AntBuilder      ant;
-  private ResourceBundle  bundle;
+  private final AntBuilder  ant;
+  private ResourceBundle    bundle;
 
   Resource() {
     ant = new AntBuilder()
@@ -75,7 +75,7 @@ class Resource {
       ant.echo level: msgDebug, 'Checking resource bundle.'
       if (!bundle) {
         ant.echo level: msgDebug, 'Bundle not loaded yet... getting it.'
-        bundle = ResourceBundle.getBundle( 'resources.Language' )
+        bundle = ResourceBundle.getBundle( 'Language' )
       } else {
         ant.echo level: msgDebug, 'Nothing to do.. resource bundle was already loaded.'
       }
