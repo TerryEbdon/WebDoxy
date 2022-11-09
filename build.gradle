@@ -14,7 +14,20 @@ plugins {
   // id 'jacoco'       // Instrument build & add coverage reporting tasks
 }
 
-sourceSets.main.groovy.srcDirs = ['src']
+sourceSets {
+  main {
+    groovy.srcDirs = ['src']
+    resources {
+      // srcDir 'resources'
+      srcDir 'src/resources'
+      include '**/*.properties'
+    }
+  }
+
+  test {
+    groovy.srcDirs = ['srcTest']
+  }
+}
 
 codenarc {
   configFile = file("$rootDir/config/codenarc/codenarc-basic.groovy")
@@ -25,14 +38,6 @@ codenarcMain {
 }
 
 codenarcTest {
-}
-
-distributions {
-  main {
-    contents {
-        from 'src/resources'
-    }
-  }
 }
 
 repositories {
@@ -50,7 +55,7 @@ dependencies {
 }
 
 test {
-  // useJUnitPlatform()
+  useJUnitPlatform()
 }
 
 application {

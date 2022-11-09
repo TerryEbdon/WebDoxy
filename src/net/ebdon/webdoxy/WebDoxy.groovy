@@ -3,7 +3,8 @@ package net.ebdon.webdoxy;
 import java.time.temporal.IsoFields;
 import groovy.ant.AntBuilder          // AntBuilder has moved.
 import org.codehaus.groovy.ant.FileScanner
-import groovy.cli.commons.CliBuilder  // CliBuilder has moved.
+import groovy.cli.picocli.CliBuilder;
+
 /**
  * @file
  * @author  Terry Ebdon
@@ -74,11 +75,6 @@ For each configured site (live, staged, draft...)
 class WebDoxy {
   static final defaultConfigs = [ 'live', 'staged' ];
   static Resource resource = new Resource();
-
-  // static final String msgDebug = 'debug';
-  // static final String msgInfo  = 'info';
-  // static final String msgWarn  = 'warn';
-  // static final String msgError = 'error';
 
   def projects = []; ///< List of projects that the commansd(s) will apply to
   Boolean doxygenInitialised = false;
