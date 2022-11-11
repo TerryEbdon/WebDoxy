@@ -11,7 +11,7 @@ plugins {
   id 'groovy'
   id 'codenarc'
   id 'application'  // support for building a CLI application.
-  // id 'jacoco'       // Instrument build & add coverage reporting tasks
+  id 'jacoco'       // Instrument build & add coverage reporting tasks
 }
 
 sourceSets {
