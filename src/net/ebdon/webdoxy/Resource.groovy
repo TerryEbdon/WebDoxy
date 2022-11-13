@@ -43,9 +43,9 @@ class Resource {
   }
 
   String message( final String msgId ) {
+    ant.echo level: msgDebug, "Getting string for key $msgId without args"
     loadBundle()
     try {
-      ant.echo level: msgDebug, "Getting string for key $msgId without args"
       bundle.getString( msgId )
     } catch ( java.util.MissingResourceException ex ) {
       ant.fail "Couldn't load resource / message: ${ex.message}"
@@ -74,10 +74,10 @@ class Resource {
     try {
       ant.echo level: msgDebug, 'Checking resource bundle.'
       if (!bundle) {
-        ant.echo level: msgDebug, 'Bundle not loaded yet... getting it.'
+        ant.echo level: msgDebug, 'Bundle not loaded yet, getting it.'
         bundle = ResourceBundle.getBundle( 'Language' )
       } else {
-        ant.echo level: msgDebug, 'Nothing to do.. resource bundle was already loaded.'
+        ant.echo level: msgDebug, 'Nothing to do, resource bundle was already loaded.'
       }
     } catch ( java.util.MissingResourceException ex ) {
       ant.fail "Failed to load resource bundle: ${ex.message}"
