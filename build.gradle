@@ -11,7 +11,7 @@ plugins {
   id 'groovy'
   id 'codenarc'
   id 'application'  // support for building a CLI application.
-  // id 'jacoco'       // Instrument build & add coverage reporting tasks
+  id 'jacoco'       // Instrument build & add coverage reporting tasks
 }
 
 sourceSets {
@@ -48,6 +48,10 @@ repositories {
 dependencies {
   implementation 'org.apache.groovy:groovy-all:4.0.4'
 
+  implementation 'org.apache.logging.log4j:log4j-api:2.19.0'
+  implementation 'org.apache.logging.log4j:log4j-core:2.19.0'
+  implementation 'org.apache.logging.log4j:log4j-jcl:2.19.0'
+
   testImplementation("org.junit.jupiter:junit-jupiter-api:5.1.0")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.1.0")
   testCompileOnly("junit:junit:4.12")
@@ -56,6 +60,29 @@ dependencies {
 
 test {
   useJUnitPlatform()
+  finalizedBy jacocoTestReport // Always report after testing
+}
+
+jacocoTestReport {
+    dependsOn test // Run tests before generating report
+}
+
+check.dependsOn jacocoTestCoverageVerification
+
+jacocoTestCoverageVerification {
+  violationRules {
+    // As only one class is currently tested I have a single rule that includes
+    // just that class. This will change as test coverage improves.
+    rule {
+      element = 'CLASS'
+      includes = ['net.ebdon.webdoxy.Resource']
+      limit {
+        counter = 'LINE'
+        value = 'COVEREDRATIO'
+        minimum = 1.0
+      }
+    }
+  }
 }
 
 application {
