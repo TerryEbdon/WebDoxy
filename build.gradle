@@ -71,15 +71,22 @@ check.dependsOn jacocoTestCoverageVerification
 
 jacocoTestCoverageVerification {
   violationRules {
-    // As only one class is currently tested I have a single rule that includes
-    // just that class. This will change as test coverage improves.
     rule {
-      element = 'CLASS'
+      element  = 'CLASS'
       includes = ['net.ebdon.webdoxy.Resource']
       limit {
         counter = 'LINE'
-        value = 'COVEREDRATIO'
+        value   = 'COVEREDRATIO'
         minimum = 1.0
+      }
+    }
+    rule {
+      element  = 'CLASS'
+      includes = ['net.ebdon.webdoxy.Backup']
+      limit {
+        counter = 'LINE'
+        value   = 'COVEREDRATIO'
+        minimum = 0.7
       }
     }
   }
