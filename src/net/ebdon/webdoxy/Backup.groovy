@@ -1,6 +1,7 @@
 package net.ebdon.webdoxy;
 
-import groovy.ant.AntBuilder          // AntBuilder has moved.
+import groovy.ant.AntBuilder;
+import java.text.SimpleDateFormat;
 /**
  * @file
  * @author  Terry Ebdon
@@ -36,7 +37,6 @@ class Backup {
 
   def config;
   def ant = new AntBuilder();
-  Project project;
 
   public static main( args ) {
     new Backup().run()
@@ -46,18 +46,20 @@ class Backup {
     config = new ConfigSlurper().
       parse( new File( 'config.groovy' ).
       toURI().toURL() )
-    project = new Project( 'backup', config )
   }
 
   public void run() {
+    final SimpleDateFormat sdfTimestamp = new SimpleDateFormat('yyyy-MM-dd_HHmm')
+    final SimpleDateFormat sdfSuffix    = new SimpleDateFormat('yyyy/yyyy-MM')
+    final Date backupDate               = new Date()
+    final String backupTimestamp        = sdfTimestamp.format( backupDate )
+    final String backupFolderSuffix     = sdfSuffix.format( backupDate )
+    final String backupFolder           = "backup/$backupFolderSuffix"
+    final String backupCopyRoot         = config.backup.copyRoot
+    final String backupCopyFolderRoot   = config.backup.copyFolderRoot
     ant.with {
-      final String backupTimestamp      = new Date().format('yyyy-MM-dd_HHmm')
-      final String backupFolderSuffix   = "${new Date().format('yyyy/yyyy-MM')}"
-      final String backupFolder         = "backup/$backupFolderSuffix"
-      final String backupCopyRoot       = config.backup.copyRoot
-      final String backupCopyFolderRoot = config.backup.copyFolderRoot
-      echo level: 'debug', "Timestamp:\t $backupTimestamp"
-      echo level: 'debug', "Folder:\t $backupFolder"
+      echo level: 'debug', "Timestamp: $backupTimestamp"
+      echo level: 'debug', "Folder: $backupFolder"
       mkdir dir: backupFolder
 
       def pathBits = new File('.').absolutePath.split('\\\\')
@@ -79,12 +81,13 @@ class Backup {
           mkdir dir: backupCopyFolder
           copy file: zipFile, todir: backupCopyFolder
         } else {
-          fail(
+          final String failureReason =
             new Resource().message(
               'backup.copyDriveOffline',
               [backupCopyRoot] as Object[]
             )
-          )
+          echo level: 'debug', "Failing with: $failureReason"
+          fail failureReason
         }
       } else {
         new Resource().with {
