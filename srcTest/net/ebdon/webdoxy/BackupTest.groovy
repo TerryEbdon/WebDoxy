@@ -45,12 +45,14 @@ class BackupTest extends GroovyTestCase {
     resourceMock      = new MockFor( Resource )
     configSlurperMock = new MockFor( ConfigSlurper)
 
+    resourceMock.demand.getMsgDebug(3) { logger.debug 'msgDebug 1*'; 'debug 1*' }
     resourceMock.demand.message { final String key, final Object[] args ->
       final String returnVal = "Resource.message() called with key $key & args $args"
       logger.info returnVal
       assert key == 'backup.copyDriveOffline'
       returnVal
     }
+    resourceMock.demand.getMsgDebug(1) { logger.debug 'msgDebug 2*'; 'debug 2*' }
 
     antMock.demand.'with'(1) { Closure closure ->
       logger.info 'Calling closure'

@@ -1,7 +1,10 @@
 package net.ebdon.webdoxy;
 
 import groovy.ant.AntBuilder;
-import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.ZoneId;
+
 /**
  * @file
  * @author  Terry Ebdon
@@ -35,12 +38,8 @@ import java.text.SimpleDateFormat;
 */
 class Backup {
 
-  def config;
-  def ant = new AntBuilder();
-
-  public static main( args ) {
-    new Backup().run()
-  }
+  final config;
+  final AntBuilder ant = new AntBuilder();
 
   Backup() {
     config = new ConfigSlurper().
@@ -48,29 +47,32 @@ class Backup {
       toURI().toURL() )
   }
 
-  public void run() {
-    final SimpleDateFormat sdfTimestamp = new SimpleDateFormat('yyyy-MM-dd_HHmm')
-    final SimpleDateFormat sdfSuffix    = new SimpleDateFormat('yyyy/yyyy-MM')
-    final Date backupDate               = new Date()
-    final String backupTimestamp        = sdfTimestamp.format( backupDate )
-    final String backupFolderSuffix     = sdfSuffix.format( backupDate )
-    final String backupFolder           = "backup/$backupFolderSuffix"
-    final String backupCopyRoot         = config.backup.copyRoot
-    final String backupCopyFolderRoot   = config.backup.copyFolderRoot
-    ant.with {
-      echo level: 'debug', "Timestamp: $backupTimestamp"
-      echo level: 'debug', "Folder: $backupFolder"
-      mkdir dir: backupFolder
+  void run() {
+    final DateTimeFormatter fmtTimestamp = DateTimeFormatter.ofPattern('yyyy-MM-dd_HHmm')
+    final DateTimeFormatter fmtSuffix    = DateTimeFormatter.ofPattern('yyyy/yyyy-MM')
+    final ZoneId zoneId                  = ZoneId.of('Etc/UTC')
+    final ZonedDateTime backupDate       = ZonedDateTime.now(zoneId)
 
-      def pathBits = new File('.').absolutePath.split('\\\\')
-      assert pathBits.length > 1
-      final String baseDir = pathBits[ pathBits.length == 2 ? -1 : -2 ]
+    final String backupTimestamp         = backupDate.format( fmtTimestamp )
+    final String backupFolderSuffix      = backupDate.format( fmtSuffix )
+    final String backupFolder            = "backup/$backupFolderSuffix"
+    final String backupCopyRoot          = config.backup.copyRoot
+    final String backupCopyFolderRoot    = config.backup.copyFolderRoot
+
+    ant.with {
+      echo level: Resource.msgDebug, "Timestamp: $backupTimestamp"
+      echo level: Resource.msgDebug, "Folder: $backupFolder"
+      mkdir dir: backupFolder
+      final String currentFolder = '.'
+      final List<String> pathBits = new File(currentFolder).absolutePath.split('\\\\')
+      assert pathBits.size > 1
+      final String baseDir = pathBits[ pathBits.size == 2 ? -1 : -2 ]
       String zipFile = "$backupFolder/${backupTimestamp}_${baseDir}.zip"
-      echo level: 'debug', zipFile
+      echo level: Resource.msgDebug, zipFile
       if ( !new File( zipFile ).exists() ) {
         zip( destfile: zipFile ) {
           fileset(
-            dir: '.',
+            dir: currentFolder,
             excludesfile: config.backup.excludesFile
           )
         }
@@ -86,7 +88,7 @@ class Backup {
               'backup.copyDriveOffline',
               [backupCopyRoot] as Object[]
             )
-          echo level: 'debug', "Failing with: $failureReason"
+          echo level: Resource.msgDebug, "Failing with: $failureReason"
           fail failureReason
         }
       } else {
