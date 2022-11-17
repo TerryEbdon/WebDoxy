@@ -16,15 +16,15 @@ backup {
 
 project {
 	author {
-		name = 'unknown uauthor'
+		name = 'unknown author'
 		page = '@ref AboutMe'
 	}
 	toc {
 		name             = 'TableOfContents'
 		brief            = 'Directory of known, documented, projects that have been built.'
 
-		disableIndex     = "NO"		// Overide the generic project setting.
-		generateTreeView = "YES"	// Overide the generic project setting
+		disableIndex     = "NO"		// Override the generic project setting.
+		generateTreeView = "YES"	// Override the generic project setting
 	}
 
 	baseDoxyFile     = "Doxyfile."

@@ -1,8 +1,14 @@
 {
   "cSpell.enableFiletypes": [
+    "groovy",
     "properties"
   ],
   "cSpell.words": [
-    "bcdghjntv"
+    "bcdghjntv",
+    "doxyfile"
+  ],
+  "cSpell.ignoreWords": [
+    "mycopy",
+    "w'ww"
   ]
 }
