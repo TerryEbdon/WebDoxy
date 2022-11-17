@@ -5,7 +5,12 @@
   ],
   "cSpell.words": [
     "bcdghjntv",
-    "doxyfile"
+    "doxyfile",
+    "excludesfile",
+    "fileset",
+    "mkdir",
+    "todir",
+    "webdoxy"
   ],
   "cSpell.ignoreWords": [
     "mycopy",

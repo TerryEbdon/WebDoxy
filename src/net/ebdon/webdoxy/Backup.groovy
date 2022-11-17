@@ -73,7 +73,8 @@ class Backup {
         zip( destfile: zipFile ) {
           fileset(
             dir: currentFolder,
-            excludesfile: config.backup.excludesFile
+            excludesfile: config.backup.excludesFile,
+            excludes: '**/*.7z, **/*.zip, **/*.rar, **/*.tar'
           )
         }
 
