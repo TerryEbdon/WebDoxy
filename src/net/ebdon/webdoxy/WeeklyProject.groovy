@@ -3,6 +3,8 @@ package net.ebdon.webdoxy;
 import java.text.SimpleDateFormat;
 import java.time.temporal.IsoFields;
 
+// import groovy.transform.TypeChecked;
+
 /**
  * @file
  * @author  Terry Ebdon
@@ -23,7 +25,7 @@ import java.time.temporal.IsoFields;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+@groovy.util.logging.Log4j2('logger')
 class WeeklyProject extends JournalProject {
 
   WeeklyProject( projectName, buildConfig ) {
@@ -38,14 +40,14 @@ class WeeklyProject extends JournalProject {
     zonedDate.get( IsoFields.WEEK_OF_WEEK_BASED_YEAR )
   }
 
+  // @TypeChecked
   String getPageTitle() {
     final pageYear = zonedDate.get( IsoFields.WEEK_BASED_YEAR )
     final Date sunday = pageDate + 6
 
-    ant.echo level: 'info',
-      "Creating weekly page title for year $pageYear, week $pageWeek"
+    logger.info "Creating weekly page title for year $pageYear, week $pageWeek"
 
-    final pageAnchor = "{#y${pageYear}_w${pageWeek}}"
+    final String pageAnchor = "{#y${pageYear}_w${pageWeek}}"
     "# ${monthTitle( pageDate, sunday )} -- $pageYear week $pageWeek $pageAnchor"
   }
 
@@ -77,25 +79,23 @@ class WeeklyProject extends JournalProject {
 
     pageDate = startOfWeek( date )
 
-    ant.with {
-      echo level: 'info', "fullFolderPath: $fullFolderPath"
-      echo level: 'info', "Full path: $fullPath"
+    logger.info "fullFolderPath: $fullFolderPath"
+    logger.info "Full path: $fullPath"
 
-      mkdir dir: fullFolderPath
-      echo level: 'info', "Creating page file: $fullPath"
-    }
+    ant.mkdir dir: fullFolderPath
+    logger.info "Creating page file: $fullPath"
 
     File pageFile = new File( fullPath )
 
     if ( !pageFile.exists() ) {
-      def page = new WeekPage( this, pageFile )
+      final WeekPage page = new WeekPage( this, pageFile )
 
       page.create()
       addPageToQuarter  page
       addPageToMonth    page, false
     } else {
-      ant.echo level: 'warn',  message( 'JournalProject.nothingToDo' )
-      ant.echo level: 'debug', " --> ${pageFile.absolutePath}"
+      logger.warn   message( 'JournalProject.nothingToDo' )
+      logger.debug  " --> ${pageFile.absolutePath}"
     }
   }
 
@@ -103,10 +103,10 @@ class WeeklyProject extends JournalProject {
   def addPageToMonth( JournalPage weekPage, boolean subPage = true ) {
     assert weekPage
     if ( buildConfig.project.journal.pages.monthly.required ) {
-      ant.echo "****Monthly pages *ARE* required"
+      logger.info "**** Monthly pages *ARE* required"
 
       final def monthFmtStr = buildConfig.project.journal.pages.monthly.format
-      ant.echo level: 'info', "Month format string: ${monthFmtStr}"
+      logger.info "Month format string: ${monthFmtStr}"
       final def SimpleDateFormat monthFormatter = new SimpleDateFormat( monthFmtStr ?: 'MMMM' )
       final def monthFileName = monthFormatter.format( pageDate ) + markdownFileType
       File monthFile = new File( "${monthFolderPath}/${monthFileName}" )
@@ -116,7 +116,6 @@ class WeeklyProject extends JournalProject {
     }
   }
 
-
   @Override
   def getMonthFolderPath() {
     yearFolderPath
@@ -125,7 +124,7 @@ class WeeklyProject extends JournalProject {
   def addPageToQuarter( JournalPage weekPage ) {
     assert weekPage
     if ( buildConfig.project.journal.pages.quarterly.required ) {
-      ant.echo "Quarterly pages ARE required"
+      logger.info "Quarterly pages ARE required"
       final def fileName = "${pageYear}-q${pageQuarter}${markdownFileType}"
 
       File file = new File( "${yearFolderPath}/${fileName}" )
@@ -133,12 +132,12 @@ class WeeklyProject extends JournalProject {
       QuarterPage quarterPage = new QuarterPage( this, file )
       quarterPage.create()
       if ( buildConfig.project.journal.pages.quarterly.addLinkToNewWeekPage ) {
-        ant.echo level: 'info', "Adding: $weekPage"
-        ant.echo level: 'info', "    to: $quarterPage"
+        logger.info "Adding: $weekPage"
+        logger.info "    to: $quarterPage"
         quarterPage.addPageLink weekPage, true
       }
     } else {
-      ant.echo "Quarterly pages are NOT required"
+      logger.info "Quarterly pages are NOT required"
     }
   }
 }

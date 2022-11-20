@@ -45,14 +45,12 @@ class BackupTest extends GroovyTestCase {
     resourceMock      = new MockFor( Resource )
     configSlurperMock = new MockFor( ConfigSlurper)
 
-    resourceMock.demand.getMsgDebug(3) { logger.debug 'msgDebug 1*'; 'debug 1*' }
     resourceMock.demand.message { final String key, final Object[] args ->
       final String returnVal = "Resource.message() called with key $key & args $args"
       logger.info returnVal
       assert key == 'backup.copyDriveOffline'
       returnVal
     }
-    resourceMock.demand.getMsgDebug(1) { logger.debug 'msgDebug 2*'; 'debug 2*' }
 
     antMock.demand.'with'(1) { Closure closure ->
       logger.info 'Calling closure'
@@ -79,10 +77,6 @@ class BackupTest extends GroovyTestCase {
               folderCreated = true
             }
             @TypeChecked
-            final void echo( final Map<String,String> args, final String message ) {
-              logger.info "echo called with args: $args, $message"
-            }
-            @TypeChecked
             final void zip( final Map<String,String> args, final Closure closure ) {
               logger.info "Backup.zip called with $args"
               assert folderCreated
@@ -91,7 +85,7 @@ class BackupTest extends GroovyTestCase {
               assert !filesetCalled
               zipped = true
               closure()
-              logger.info 'Back from zip closure'
+              logger.info "Back from zip closure, filesetCalled: $filesetCalled"
               assert filesetCalled
             }
             final void fileset( final Map<String,String> args ) {

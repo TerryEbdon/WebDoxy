@@ -21,16 +21,16 @@ package net.ebdon.webdoxy;
  * limitations under the License.
  */
 
+@groovy.util.logging.Log4j2('logger')
 class QuarterPage extends JournalPage {
 
   QuarterPage( JournalProject jp, File quarterFile ) {
     super( jp, quarterFile )
-    project.ant.echo level: 'debug', 'QuarterPage instantiated'
+    logger.debug 'QuarterPage instantiated'
   }
 
   String getPageTitle() {
-    project.ant.echo level: 'info',
-      "Creating quarterly page title for year $pageYear, week $pageWeek"
+    logger.info "Creating quarterly page title for year $pageYear, week $pageWeek"
 
     "# $pageYear Q${pageQuarter} {#$pageAnchor}"
   }
@@ -47,10 +47,10 @@ class QuarterPage extends JournalPage {
 
   @Override
   def create() {
-    project.ant.echo level: 'info', 'QuarterPge.create() called'
+    logger.info 'QuarterPge.create() called'
 
     if ( exists() ) {
-      project.ant.echo level: 'info', project.message( 'QuarterPage.alreadyExists' )
+      logger.info project.message( 'QuarterPage.alreadyExists' )
     } else {
       super.create()
     }

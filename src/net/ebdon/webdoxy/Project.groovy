@@ -1,4 +1,5 @@
 package net.ebdon.webdoxy;
+
 import java.text.SimpleDateFormat;
 import groovy.ant.AntBuilder;         // AntBuilder has moved.
 
@@ -30,6 +31,8 @@ import groovy.ant.AntBuilder;         // AntBuilder has moved.
  @todo Move all string constants into config.groovy
  @todo Move all message strings into Language.properties
  */
+
+@groovy.util.logging.Log4j2('logger')
 class Project {
   final String name;
   final def buildConfig;  //!< @see config.groovy
@@ -45,21 +48,21 @@ class Project {
   }
 
   void create() {
-    ant.echo level: 'info', "Creating project $name in $rootFolder"
+    logger.info "Creating project $name in $rootFolder"
     createFolders()
     createConfigFile()
     createMainPage()
   }
 
   void createFolders() {
-    ant.echo level: 'debug', "Creating source folder: $sourceFolder"
+    logger.debug "Creating source folder: $sourceFolder"
     ant.mkdir dir: sourceFolder
     ant.mkdir dir: imageFolder
     ant.mkdir dir: diaFolder
 
-    ant.echo level: 'info', "creating example folders: $exampleFolders"
+    logger.info "creating example folders: $exampleFolders"
     exampleFolders.each { ef ->
-      ant.echo level: 'debug', "Creating example folder: $ef"
+      logger.debug "Creating example folder: $ef"
       ant.mkdir dir: "$rootFolder/$ef"
     }
   }
@@ -108,12 +111,12 @@ class Project {
   }
 
   void createMainPage() {
-    ant.echo level: 'info', "Creating main page markdown for project $name"
+    logger.info "Creating main page markdown for project $name"
     File mainPageFile = new File( mainMarkDownFileName )
     if ( !mainPageFile.exists() ) {
       mainPageFile << "# $displayName {#mainpage}\n\\todo Create content for this web site.\n"
     } else {
-      ant.echo level: 'warn', "Main page markdown already exists for project $name"
+      logger.warn "Main page markdown already exists for project $name"
     }
   }
 
@@ -132,10 +135,7 @@ class Project {
 
     File pageFile = new File( markDownFileName( pageName ) )
     if ( !pageFile.exists() ) {
-      ant.echo(
-        level: Resource.msgWarn,
-        resource.message( 'project.stub.creatingPage', msgArgs )
-      )
+      logger.warn resource.message( 'project.stub.creatingPage', msgArgs )
       pageFile << "\\page $pageName $pageName\n"
       pageFile << "[TOC]\n"
       pageFile << "\\date ${pageDate}\n"
@@ -148,10 +148,7 @@ class Project {
       pageFile << buildConfig.project.page.stub.footer << '\n'
       addToStubList pageName
     } else {
-      ant.echo(
-        level: Resource.msgWarn,
-        resource.message( 'project.stub.pageAlreadyExists', msgArgs )
-      )
+      logger.warn resource.message( 'project.stub.pageAlreadyExists', msgArgs )
     }
   }
 
@@ -179,7 +176,7 @@ class Project {
   }
 
   void cleanOutputFolders() {
-    ant.echo level: 'debug', "delete folder ${htmlFolder}/${name}"
+    logger.debug "delete folder ${htmlFolder}/${name}"
     //~ ant.delete dir: "${htmlFolder}/${name}"
     //~ ant.mkdir dir: "${htmlFolder}/${name}"
     cleanFolder htmlFolder
@@ -187,7 +184,7 @@ class Project {
   }
 
   void cleanFolder( folderName ) {
-    ant.echo level: 'info', "delete folder ${folderName}"
+    logger.info "delete folder ${folderName}"
     ant.delete dir: "${folderName}", verbose: buildConfig.verboseCleanUp
     ant.mkdir dir: "${folderName}"
   }

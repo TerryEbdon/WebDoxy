@@ -1,6 +1,7 @@
 package net.ebdon.webdoxy;
 
 import java.text.SimpleDateFormat;
+import groovy.transform.TypeChecked;
 
 /**
  * @file
@@ -22,22 +23,23 @@ import java.text.SimpleDateFormat;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+@groovy.util.logging.Log4j2('logger')
 class WeekPage extends JournalPage {
 
   final String anchorDateFormat = ''''day'_yyyy_MM_dd'''
   String pageAnchor
 
+  @TypeChecked
   WeekPage( JournalProject jp, File file ) {
     super( jp, file )
-    project.ant.echo level:'debug', "WeekPage instantiated."
+    logger.debug 'WeekPage instantiated.'
   }
 
+  // @TypeChecked
   String getPageTitle() {
     final Date sunday = project.pageDate + 6
 
-    project.ant.echo level: 'info',
-      "Creating weekly page title for year $pageYear, week $pageWeek"
+    logger.info "Creating weekly page title for year $pageYear, week $pageWeek"
 
     pageAnchor = "y${pageYear}_w${pageWeek}"
     "# ${project.monthTitle( project.pageDate, sunday )} -- $pageYear week $pageWeek {#$pageAnchor}"

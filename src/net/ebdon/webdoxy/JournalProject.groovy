@@ -2,6 +2,7 @@ package net.ebdon.webdoxy;
 
 import java.text.SimpleDateFormat;
 import java.time.temporal.IsoFields;
+import groovy.transform.TypeChecked;
 
 /**
  * @file
@@ -23,7 +24,7 @@ import java.time.temporal.IsoFields;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+@groovy.util.logging.Log4j2('logger')
 class JournalProject extends Project {
 
   Date pageDate = new Date();
@@ -61,23 +62,21 @@ class JournalProject extends Project {
   def createPage( Date date ) {
     pageDate = date
 
-    ant.with {
-      echo level: 'debug', "fullFolderPath: $fullFolderPath"
-      echo level: 'debug', "Full path: $fullPath"
+    logger.debug "fullFolderPath: $fullFolderPath"
+    logger.debug "Full path: $fullPath"
+    ant.mkdir dir: fullFolderPath
 
-      mkdir dir: fullFolderPath
-      echo level: 'info', "Creating page file: $fullPath"
-    }
+    logger.info "Creating page file: $fullPath"
 
-    File pageFile = new File( fullPath )
+    final File pageFile = new File( fullPath )
 
     if ( !pageFile.exists() ) {
-      def page = new JournalPage( this, pageFile )
+      final JournalPage page = new JournalPage( this, pageFile )
       page.create()
       addPageToMonth page
     } else {
-      ant.echo level: 'warn',  message( 'JournalProject.nothingToDo' )
-      ant.echo level: 'debug', " --> ${pageFile.absolutePath}"
+      logger.warn  message( 'JournalProject.nothingToDo' )
+      logger.debug " --> ${pageFile.absolutePath}"
     }
   }
 
@@ -85,7 +84,7 @@ class JournalProject extends Project {
     assert dayPage
     if ( buildConfig.project.journal.pages.monthly.required ) {
       final def monthFmtStr = buildConfig.project.journal.pages.monthly.format
-      ant.echo level: 'debug', "Month format string: ${monthFmtStr}"
+      logger.debug "Month format string: ${monthFmtStr}"
       final def SimpleDateFormat monthFormatter = new SimpleDateFormat( monthFmtStr ?: 'MMMM' )
       final def monthFileName = monthFormatter.format( pageDate ) + markdownFileType
       File monthFile = new File( "${monthFolderPath}/${monthFileName}" )
@@ -93,8 +92,8 @@ class JournalProject extends Project {
       MonthPage monthPage = new MonthPage( this, monthFile )
       monthPage.create()
       if ( buildConfig.project.journal.pages.monthly.addLinkToNewDayPage ) {
-        ant.echo level: 'info', "Adding: $dayPage"
-        ant.echo level: 'info', "    to: $monthPage"
+        logger.info "Adding: $dayPage"
+        logger.info "    to: $monthPage"
         monthPage.addPageLink dayPage, subPage
       }
     }
@@ -138,20 +137,20 @@ class JournalProject extends Project {
     * @return        The folder name or an empty string, if not required.
     */
   def dateFolder( String formatProp, String  folderReqdProp = formatProp + 'ly' ) {
-    ant.echo level:'debug', "folderProp: $folderReqdProp, formatProp: $formatProp"
+    logger.debug "folderProp: $folderReqdProp, formatProp: $formatProp"
     folderRequired( folderReqdProp ) ? dateFormatter( formatProp ).format( pageDate) +'/' : ''
   }
 
   def folderRequired( reqdPropertyName ) {
     final required = buildConfig.project.journal.folders[ reqdPropertyName ]
-    ant.echo level: 'debug', "$reqdPropertyName Required: $required"
+    logger.debug "$reqdPropertyName Required: $required"
     required
   }
 
-  SimpleDateFormat dateFormatter( name ) {
-    ant.echo level: 'debug', "Getting journal date format name: $name"
-    final format = buildConfig.project.journal.format[name]
-    ant.echo level: 'debug', "journal date format $name = $format"
+  SimpleDateFormat dateFormatter( final String name ) {
+    logger.debug "Getting journal date format name: $name"
+    final String format = buildConfig.project.journal.format[name]
+    logger.debug "journal date format $name = $format"
     new SimpleDateFormat( format )
   }
 }

@@ -1,6 +1,7 @@
 package net.ebdon.webdoxy;
 
 import groovy.ant.AntBuilder          // AntBuilder has moved.
+
 /**
  * @file
  * @author  Terry Ebdon
@@ -22,6 +23,7 @@ import groovy.ant.AntBuilder          // AntBuilder has moved.
  * limitations under the License.
  */
 
+@groovy.util.logging.Log4j2('logger')
 class ProjectConfigFile {
   final Project project;
   File configFile;
@@ -38,7 +40,7 @@ class ProjectConfigFile {
   void create() {
     configFile = new File( project.configFileName )
     if ( !configFile.exists() ) {
-      ant.echo level: 'debug', "Creating configuration file ${project.configFileName}"
+      logger.debug "Creating configuration file ${project.configFileName}"
       project.with {
         set '@INCLUDE',         buildConfig.project.baseDoxyFile
         set 'PROJECT_NAME',     name
@@ -62,7 +64,7 @@ class ProjectConfigFile {
         }
       }
     } else {
-      ant.echo level: 'warn', "Configuration file for project ${project.name} already exists."
+      logger.warn "Configuration file for project ${project.name} already exists."
     }
   }
 

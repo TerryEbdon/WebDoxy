@@ -36,6 +36,7 @@ import java.time.ZoneId;
 
 @brief Backup all source files into a date/time based zip in a year/year-month specific folder
 */
+@groovy.util.logging.Log4j2('logger')
 class Backup {
 
   final config;
@@ -60,15 +61,15 @@ class Backup {
     final String backupCopyFolderRoot    = config.backup.copyFolderRoot
 
     ant.with {
-      echo level: Resource.msgDebug, "Timestamp: $backupTimestamp"
-      echo level: Resource.msgDebug, "Folder: $backupFolder"
+      logger.debug "Timestamp: $backupTimestamp"
+      logger.debug "Folder: $backupFolder"
       mkdir dir: backupFolder
       final String currentFolder = '.'
       final List<String> pathBits = new File(currentFolder).absolutePath.split('\\\\')
       assert pathBits.size > 1
       final String baseDir = pathBits[ pathBits.size == 2 ? -1 : -2 ]
       String zipFile = "$backupFolder/${backupTimestamp}_${baseDir}.zip"
-      echo level: Resource.msgDebug, zipFile
+      logger.debug zipFile
       if ( !new File( zipFile ).exists() ) {
         zip( destfile: zipFile ) {
           fileset(
@@ -89,12 +90,12 @@ class Backup {
               'backup.copyDriveOffline',
               [backupCopyRoot] as Object[]
             )
-          echo level: Resource.msgDebug, "Failing with: $failureReason"
+          logger.debug "Failing with: $failureReason"
           fail failureReason
         }
       } else {
         new Resource().with {
-          echo level: msgWarn, message( 'backup.alreadyExists' )
+          logger.warn message( 'backup.alreadyExists' )
         }
       }
     }
