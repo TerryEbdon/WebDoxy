@@ -2,6 +2,7 @@ package net.ebdon.webdoxy;
 
 import java.text.SimpleDateFormat;
 import java.time.temporal.IsoFields;
+import groovy.transform.TypeChecked;
 
 /**
  * @file
@@ -24,13 +25,15 @@ import java.time.temporal.IsoFields;
  * limitations under the License.
  */
 
+@groovy.util.logging.Log4j2('logger')
 class MonthSummaryPage extends JournalPage {
 
   Date dayInMonth
 
+  @TypeChecked
   MonthSummaryPage( JournalProject jp, File monthFile ) {
     super( jp, monthFile )
-    project.ant.echo level: 'debug', 'MonthSummaryPage instantiated'
+    logger.debug 'MonthSummaryPage instantiated'
   }
 
   def init() {
@@ -42,10 +45,10 @@ class MonthSummaryPage extends JournalPage {
   }
 
   def create() {
-    project.ant.echo level: 'debug', 'MonthSummaryPage.create() called'
+    logger.debug 'MonthSummaryPage.create() called'
 
     if ( exists() ) {
-      project.ant.echo level: 'info', project.message( 'MonthSummaryPage.alreadyExists' )
+      logger.info project.resource.message( 'MonthSummaryPage.alreadyExists' )
     } else {
       super.create()
     }

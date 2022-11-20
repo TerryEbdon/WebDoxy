@@ -29,6 +29,7 @@ import java.text.MessageFormat;
  @author  Terry Ebdon
  */
 
+@groovy.util.logging.Log4j2('logger')
 class Resource {
   static final String msgDebug = 'debug';
   static final String msgInfo  = 'info';
@@ -43,7 +44,7 @@ class Resource {
   }
 
   String message( final String msgId ) {
-    ant.echo level: msgDebug, "Getting string for key $msgId without args"
+    logger.trace "Getting string for key $msgId without args"
     loadBundle()
     try {
       bundle.getString( msgId )
@@ -56,15 +57,15 @@ class Resource {
     loadBundle()
     String rawMsg
     try {
-      ant.echo level: msgDebug, "Getting string for key $msgId with args"
+      logger.trace "Getting string for key $msgId with args"
       rawMsg = bundle.getString( msgId )
-      ant.echo level: msgDebug, "Unformatted message is: $rawMsg"
+      logger.trace "Unformatted message is: $rawMsg"
     } catch ( java.util.MissingResourceException ex ) {
       ant.fail "Couldn't load resource / message: ${ex.message}"
     }
 
     MessageFormat formatter = new MessageFormat('')
-    ant.echo level: msgDebug, "Formatting $msgId with args: ${msgArgs}"
+    logger.trace "Formatting $msgId with args: ${msgArgs}"
     formatter.locale = Locale.default
     formatter.applyPattern( rawMsg )
     formatter.format( msgArgs )
@@ -72,16 +73,16 @@ class Resource {
 
   private void loadBundle() {
     try {
-      ant.echo level: msgDebug, 'Checking resource bundle.'
+      logger.trace 'Checking resource bundle.'
       if (!bundle) {
-        ant.echo level: msgDebug, 'Bundle not loaded yet, getting it.'
+        logger.trace 'Bundle not loaded yet, getting it.'
         bundle = ResourceBundle.getBundle( 'Language' )
       } else {
-        ant.echo level: msgDebug, 'Nothing to do, resource bundle was already loaded.'
+        logger.trace 'Nothing to do, resource bundle was already loaded.'
       }
     } catch ( java.util.MissingResourceException ex ) {
       ant.fail "Failed to load resource bundle: ${ex.message}"
     }
-    ant.echo level: msgDebug, 'Resource bundle looks good.'
+    logger.trace 'Resource bundle looks good.'
   }
 }

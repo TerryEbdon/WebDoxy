@@ -23,3 +23,5 @@ test-splits/
 /subprojects/*/bin
 atlassian-ide-plugin.xml
 .metadata/
+projects/
+logs/

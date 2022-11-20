@@ -1,4 +1,5 @@
 package net.ebdon.webdoxy;
+
 import java.text.SimpleDateFormat;
 import java.time.temporal.IsoFields;
 
@@ -22,7 +23,7 @@ import java.time.temporal.IsoFields;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+@groovy.util.logging.Log4j2('logger')
 class JournalPage {
 
   final JournalProject project;
@@ -47,14 +48,14 @@ class JournalPage {
     pageFile = file
     buildConfig = project.buildConfig
     init()
-    project.ant.echo level:'debug', "JournalPage instantiated."
+    logger.debug "JournalPage instantiated."
   }
 
   def init() {
     final SimpleDateFormat dayAnchorFormatter = project.dateFormatter( 'anchorDay' )
     final SimpleDateFormat shortFormat        = project.dateFormatter( 'shorter' )
 
-    project.ant.echo level: 'debug', "${dayAnchorFormatter.format( pageDate )}"
+    logger.debug "${dayAnchorFormatter.format( pageDate )}"
     anchorDate = dayAnchorFormatter.format( pageDate )
     title      = shortFormat.format( pageDate )
   }
@@ -64,12 +65,12 @@ class JournalPage {
   }
   def setAnchorDate( final String newDate ) {
     anchorDate_ = newDate
-    project.ant.echo level:'debug', "setAnchorDate called with $newDate"
-    project.ant.echo level:'debug', "anchorDate_ is now: ${anchorDate_}"
+    logger.debug "setAnchorDate called with $newDate"
+    logger.debug "anchorDate_ is now: ${anchorDate_}"
   }
 
   def getAnchorDate() {
-    // project.ant.echo level:'debug', "getAnchorDate returning ${anchorDate_}"
+    logger.trace "getAnchorDate returning ${anchorDate_}"
     anchorDate_
   }
 
@@ -82,8 +83,8 @@ class JournalPage {
   }
   def create() {
     assert pageFile
-    project.ant.echo level: 'debug', "JournalPage.create() called."
-    project.ant.echo level: 'debug', "Page file: $pageFile"
+    logger.debug "JournalPage.create() called."
+    logger.debug "Page file: $pageFile"
 
     createSkeleton()
   }
@@ -141,9 +142,9 @@ class JournalPage {
   def append( final content ) {
     assert pageFile
     if ( this.class.name.contains( 'Month' ) ) {
-      project.ant.echo level: 'debug', "Appending to: $pageFile"
-      project.ant.echo level: 'debug', "        path: ${pageFile.path}"
-      project.ant.echo level: 'debug', "      exists: ${exists()}"
+      logger.debug "Appending to: $pageFile"
+      logger.debug "        path: ${pageFile.path}"
+      logger.debug "      exists: ${exists()}"
     }
     pageFile << content << '\n'
   }
@@ -194,7 +195,7 @@ class JournalPage {
 
   def addSubPage( final JournalPage dayPage ) {
     assert dayPage
-    project.ant.echo level: 'info', "Adding page ${dayPage.title} to page $title"
+    logger.info "Adding page ${dayPage.title} to page $title"
 
     addPageLink dayPage, true
   }

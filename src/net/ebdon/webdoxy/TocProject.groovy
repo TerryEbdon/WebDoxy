@@ -1,6 +1,7 @@
 package net.ebdon.webdoxy;
 
 import groovy.ant.AntBuilder          // AntBuilder has moved.
+
 /**
  * @file
  * @author  Terry Ebdon
@@ -29,6 +30,7 @@ import groovy.ant.AntBuilder          // AntBuilder has moved.
 @todo Move all string constants into config.groovy
 @todo Move all message strings into Language.properties
 */
+@groovy.util.logging.Log4j2('logger')
 class TocProject extends Project {
 
   TocProject( buildConfig ) {
@@ -67,7 +69,7 @@ class TocProject extends Project {
 
     File tocFile = new File( mainMarkDownFileName )
     ant.with {
-      echo level: 'info', "Scanning folder tree: $htmlRootFolder"
+      logger.info "Scanning folder tree: $htmlRootFolder"
       def scanner = fileScanner {
         fileset( dir: htmlRootFolder ) {
           include( name: '**/index.html' )
@@ -79,7 +81,7 @@ class TocProject extends Project {
       tocFile << "# Known Projects {#mainpage}\n"
       for ( file in scanner ) {
         def projectName = file.parentFile.name
-        echo level: 'info', "Indexing project $projectName"
+        logger.info "Indexing project $projectName"
         // tocFile << " - [${makeDisplayable( projectName)}](../$projectName/index.html)\n"
         indexedProjects << " - [${super.makeDisplayable( projectName)}](../$projectName/index.html)\n"
       }
@@ -101,7 +103,7 @@ class TocProject extends Project {
   private void deleteFile( filePath ) {
     File file = new File( filePath )
     if ( file.exists() ) {
-      ant.echo level: 'warn', "Deleting file $filePath"
+      logger.warn "Deleting file $filePath"
       file.delete()
     }
   }

@@ -1,5 +1,7 @@
 package net.ebdon.webdoxy;
+
 import java.text.SimpleDateFormat;
+import groovy.transform.TypeChecked;
 
 /**
  * @file
@@ -22,11 +24,13 @@ import java.text.SimpleDateFormat;
  * limitations under the License.
  */
 
+@groovy.util.logging.Log4j2('logger')
 class MonthPage extends JournalPage {
 
+  @TypeChecked
   MonthPage( JournalProject jp, File monthFile ) {
     super( jp, monthFile )
-    project.ant.echo level: 'debug', 'MonthPage instantiated'
+    logger.debug 'MonthPage instantiated'
   }
 
   def init() {
@@ -37,11 +41,12 @@ class MonthPage extends JournalPage {
     title      = titleformatter.format( pageDate )
   }
 
+  @TypeChecked
   def create() {
-    project.ant.echo level: 'debug', 'MonthPage.create() called'
+    logger.debug 'MonthPage.create() called'
 
     if ( exists() ) {
-      project.ant.echo level: 'info', project.message( 'MonthPage.alreadyExists' )
+      logger.info project.resource.message( 'MonthPage.alreadyExists' )
     } else {
       super.create()
     }

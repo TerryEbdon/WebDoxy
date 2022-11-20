@@ -72,20 +72,20 @@ For each configured site (live, staged, draft...)
 
  */
 
+@groovy.util.logging.Log4j2('logger')
 class WebDoxy {
   static final defaultConfigs = [ 'live', 'staged' ];
   static Resource resource = new Resource();
 
-  def projects = []; ///< List of projects that the commansd(s) will apply to
+  def projects = []; ///< List of projects that the command(s) will apply to
   Boolean doxygenInitialised = false;
   def buildConfig;
   static AntBuilder ant = new AntBuilder();
   final def cliOptions;
 
   public static main( args ) {
-    ant.echo level: 'info', "args: $args"
+    logger.info "args: $args"
 
-    Resource resource = new Resource()
     def cli = new CliBuilder(usage: resource.message('help.usage') )
 
     cli.with {
@@ -104,9 +104,9 @@ class WebDoxy {
     }
 
     def options = cli.parse(args)
-    ant.echo level: 'info', "CliBuilder.arguments: ${options.arguments()}"
+    logger.info "CliBuilder.arguments: ${options.arguments()}"
     if (options) {
-      ant.echo level: 'info', "Working..."
+      logger.info "Working..."
       def before = System.currentTimeMillis()
       WebDoxy build = new WebDoxy( options )
 
@@ -148,7 +148,7 @@ class WebDoxy {
       }
 
       def after = System.currentTimeMillis()
-      ant.echo "WebDoxy run completed in ${(after-before)/1000} seconds"
+      logger.info "WebDoxy run completed in ${(after-before)/1000} seconds"
     }
   }
 
@@ -159,7 +159,7 @@ class WebDoxy {
     File configFile = new File( configFileName )
 
     if ( configFile.exists() ) {
-      ant.echo level: 'info', "Using config file: ${configFile.absolutePath}"
+      logger.info "Using config file: ${configFile.absolutePath}"
       buildConfig = new ConfigSlurper().parse( configFile.toURI().toURL())
 
       if ( options.project ) {
@@ -194,16 +194,15 @@ class WebDoxy {
     if ( !cliOptions.generate ) {
       validateMarkDown()
     } else {
-      ant.echo level: Resource.msgWarn, 
-        resource.message( 'webDoxy.validateSuperfluous' )
-          //> Assumes validate is called before generate
+      logger.error resource.message( 'webDoxy.validateSuperfluous' )
+        //> Assumes validate is called before generate
     }
   }
 
   void stubs() {
 
-    ant.echo level: 'info', "Adding stubs to projects: ${projects.join(', ')}"
-    ant.echo level: 'info', "Stubs are: ${cliOptions.arguments()}"
+    logger.info "Adding stubs to projects: ${projects.join(', ')}"
+    logger.info "Stubs are: ${cliOptions.arguments()}"
 
     projects.each { projectName ->
       Project project = new Project( projectName, buildConfig )
@@ -215,24 +214,24 @@ class WebDoxy {
 
   void addDiaryPage() {
     projects.each { projectName ->
-      ant.echo level: 'info', "Adding journal page to: $projectName"
+      logger.info "Adding journal page to: $projectName"
 
-      def pageDate = targetDate
+      Date pageDate = targetDate
 
       int numPagesWanted = cliOptions.number ?: 1
-      ant.echo level: 'info', "Generating $numPagesWanted journal pages."
-      ant.echo level: Resource.msgInfo, "Max pages allowed: $maxPages"
+      logger.info "Generating $numPagesWanted journal pages."
+      logger.info "Max pages allowed: $maxPages"
 
       if ( numPagesWanted > 0 && numPagesWanted <= maxPages ) {
         new JournalProject( projectName, buildConfig ).with {
           numPagesWanted.times {
-            ant.echo "Generating page for ${pageDate}"
+            logger.info "Generating journal page for ${pageDate}"
             createPage( pageDate++ )
           }
         }
       } else {
         ant.fail(
-          new Resource().message(
+          resource().message(
             'webDoxy.badNumPages',
             [numPagesWanted,maxPages] as Object[]
           )
@@ -247,7 +246,7 @@ class WebDoxy {
     if ( cliOptions.date ) {
       pageDate = Date.parse( buildConfig.datePattern, cliOptions.date )
     } else {
-      ant.echo level: 'warn', 'Date not specified, defaulting to today.'
+      logger.warn 'Date not specified, defaulting to today.'
     }
     pageDate
   }
@@ -262,33 +261,31 @@ class WebDoxy {
 
   void addWeeklyPage() {
     projects.each { projectName ->
-      ant.echo level: 'info', "Adding weekly page to: $projectName"
+      logger.info "Adding weekly page to: $projectName"
       def pageDate = targetDate
 
-      ant.echo level: 'info', 'Creating a weekly page'
+      logger.info 'Creating a weekly page'
       final zonedDate = pageDate.toZonedDateTime()
       final pageYear = zonedDate.get( IsoFields.WEEK_BASED_YEAR )
       final pageWeek = zonedDate.get( IsoFields.WEEK_OF_WEEK_BASED_YEAR )
-      ant.echo level: 'info',
-        "Creating a weekly page for year $pageYear, week $pageWeek"
 
-      ant.echo level: 'info', "Max pages allowed: $maxPages"
+      logger.info "Creating a weekly page for year $pageYear, week $pageWeek"
+      logger.info "Max pages allowed: $maxPages"
 
-      int numPagesWanted = cliOptions.number ?: 1
-      ant.echo level: 'info',
-        "Generating $numPagesWanted journal pages with increment of $dateIncrement."
+      final int numPagesWanted = cliOptions.number ?: 1
+      logger.info "Generating $numPagesWanted journal pages with increment of $dateIncrement."
 
       if ( numPagesWanted > 0 && numPagesWanted <= maxPages ) {
         new WeeklyProject( projectName, buildConfig ).with {
           numPagesWanted.times {
-            ant.echo "Generating page for ${pageDate}"
+            logger.info "Generating weekly page for ${pageDate}"
             createPage( pageDate )
             pageDate += dateIncrement
           }
         }
       } else {
         ant.fail(
-          new Resource().message(
+          resource().message(
             'webDoxy.badNumPages',
             [numPagesWanted,maxPages] as Object[]
           )
@@ -306,7 +303,7 @@ class WebDoxy {
 
   void create() {
     projects.each { name ->
-      ant.echo level: 'info', "Creating project $name"
+      logger.info "Creating project $name"
       new Project( name, buildConfig ).create()
     }
   }
@@ -320,16 +317,14 @@ class WebDoxy {
 
   void initDoxygen() {
     if ( !doxygenInitialised ) {
-      ant.with {
-        echo level: 'debug', "buildConfig.doxygen.path $buildConfig.doxygen.path"
-        echo level: 'info', "buildConfig.doxygen.ant.classPath $buildConfig.doxygen.ant.classPath"
-        echo level: 'debug', "buildConfig.doxygen.ant.className $buildConfig.doxygen.ant.className"
-
-        taskdef(
-          name: "doxygen",
-          classname: buildConfig.doxygen.ant.className,
-          classpath:  buildConfig.doxygen.ant.classPath )
-      }
+      logger.debug  "buildConfig.doxygen.path $buildConfig.doxygen.path"
+      logger.info   "buildConfig.doxygen.ant.classPath $buildConfig.doxygen.ant.classPath"
+      logger.debug  "buildConfig.doxygen.ant.className $buildConfig.doxygen.ant.className"
+      ant.taskdef(
+        name: "doxygen",
+        classname: buildConfig.doxygen.ant.className,
+        classpath: buildConfig.doxygen.ant.classPath
+      )
       doxygenInitialised = true
     }
   }
@@ -347,17 +342,18 @@ class WebDoxy {
   }
 
   void build() {
-    ant.echo level: 'info', "Building $projects"
+    logger.info "Building $projects"
     projects.each { projectName ->
       buildProject projectName
     }
-    ant.echo level: 'info', "Sucess: Built project $projects"
+    logger.info "Success: Built projects $projects"
   }
 
   void buildProject( projectName ) {
     Project project = new Project( projectName, buildConfig )
     final BigDecimal before = System.currentTimeMillis()
-    ant.echo level: 'info', "Building project: $project"
+    logger.info  "Building project: ${project.name}"
+    logger.debug "Building project: $project"
     project.cleanOutputFolders()
 
     ant.doxygen(
@@ -371,19 +367,21 @@ class WebDoxy {
     final BigDecimal after          = System.currentTimeMillis()
     final BigDecimal runTimeSeconds = (after - before) / 1000
 
-    ant.echo level: Resource.msgInfo,
-        resource.message(
-          'webDoxy.buildProject.done',
-          [projectName, runTimeSeconds] as Object[]
-        )
+    logger.info(
+      resource.message(
+        'webDoxy.buildProject.done',
+        [projectName, runTimeSeconds] as Object[]
+      )
+    )
   }
 
   void validateMarkDown() {
-    ant.echo level: Resource.msgInfo,
+    logger.info (
       resource.message(
         'webDoxy.validateMarkDown',
         [projects.toString()] as Object[]
       )
+    )
 
     projects.each { projectName ->
       validateMarkDownProject( projectName )
@@ -395,13 +393,14 @@ class WebDoxy {
   void validateMarkDownProject( final String projectName ) {
     final Project project = new Project( projectName, buildConfig )
 
-    ant.with {
-      echo level: Resource.msgInfo,
-        resource.message(
-          'webDoxy.validateMarkDownProject',
-          [project.name] as Object[]
-        )
+    logger.info(
+      resource.message(
+        'webDoxy.validateMarkDownProject',
+        [project.name] as Object[]
+      )
+    )
 
+    ant.with {
       FileScanner scanner = fileScanner {
         fileset( dir: project.rootFolder ) {
           include( name: "**/*.md" )
@@ -414,11 +413,11 @@ class WebDoxy {
 
       int badPages = 0
       for (file in scanner) {
-        ant.echo level: Resource.msgDebug, "Checking file: $file"
+        logger.debug "Checking file: $file"
         file.eachLine { line, num ->
           if ( line ==~ /\\page(\s+\w+){0,1}/ ) {
             ++badPages
-            echo level: 'error', message: "Bad page directive in $file at line $num"
+            logger.error "Bad page directive in $file at line $num"
           }
         }
       }
