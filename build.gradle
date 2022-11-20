@@ -96,7 +96,7 @@ jacocoTestCoverageVerification {
 }
 
 application {
-  mainClassName = 'net.ebdon.webdoxy.WebDoxy'
+  mainClass.set 'net.ebdon.webdoxy.WebDoxy'
 }
 
 run {
