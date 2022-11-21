@@ -2,8 +2,7 @@ package net.ebdon.webdoxy;
 
 import java.text.SimpleDateFormat;
 import java.time.temporal.IsoFields;
-
-// import groovy.transform.TypeChecked;
+import java.time.ZonedDateTime;
 
 /**
  * @file
@@ -32,7 +31,7 @@ class WeeklyProject extends JournalProject {
     super( projectName, buildConfig )
   }
 
-  java.time.ZonedDateTime getZonedDate() {
+  ZonedDateTime getZonedDate() {
     pageDate.toZonedDateTime()
   }
 
@@ -52,7 +51,13 @@ class WeeklyProject extends JournalProject {
   }
 
   Date startOfWeek( final Date date ) {
-    date - date.toZonedDateTime().dayOfWeek.value + 1 // Monday of target week
+    final ZonedDateTime dayInTargetWeek = date.toZonedDateTime()
+    final int dayNumber = dayInTargetWeek.dayOfWeek.value // 0=Monday, 7=Sunday
+    logger.trace "Day number: $dayNumber"
+
+    // Go backwards from this day number to find the previous Monday
+    ZonedDateTime monday = dayInTargetWeek.minusDays( dayNumber - 1 )
+    new Date( monday.year - 1900, monday.monthValue - 1, monday.dayOfMonth )
   }
 
   def getPageYear() {
@@ -76,7 +81,6 @@ class WeeklyProject extends JournalProject {
 
   @Override
   def createPage( final Date date ) {
-
     pageDate = startOfWeek( date )
 
     logger.info "fullFolderPath: $fullFolderPath"
@@ -103,12 +107,12 @@ class WeeklyProject extends JournalProject {
   def addPageToMonth( JournalPage weekPage, boolean subPage = true ) {
     assert weekPage
     if ( buildConfig.project.journal.pages.monthly.required ) {
-      logger.info "**** Monthly pages *ARE* required"
+      logger.info '**** Monthly pages *ARE* required'
 
-      final def monthFmtStr = buildConfig.project.journal.pages.monthly.format
+      final String monthFmtStr = buildConfig.project.journal.pages.monthly.format
       logger.info "Month format string: ${monthFmtStr}"
-      final def SimpleDateFormat monthFormatter = new SimpleDateFormat( monthFmtStr ?: 'MMMM' )
-      final def monthFileName = monthFormatter.format( pageDate ) + markdownFileType
+      final SimpleDateFormat monthFormatter = new SimpleDateFormat( monthFmtStr ?: 'MMMM' )
+      final String monthFileName = monthFormatter.format( pageDate ) + markdownFileType
       File monthFile = new File( "${monthFolderPath}/${monthFileName}" )
 
       MonthSummaryPage monthSummaryPage = new MonthSummaryPage( this, monthFile )
@@ -121,11 +125,11 @@ class WeeklyProject extends JournalProject {
     yearFolderPath
   }
 
-  def addPageToQuarter( JournalPage weekPage ) {
+  void addPageToQuarter( JournalPage weekPage ) {
     assert weekPage
     if ( buildConfig.project.journal.pages.quarterly.required ) {
-      logger.info "Quarterly pages ARE required"
-      final def fileName = "${pageYear}-q${pageQuarter}${markdownFileType}"
+      logger.info 'Quarterly pages ARE required'
+      final String fileName = "${pageYear}-q${pageQuarter}${markdownFileType}"
 
       File file = new File( "${yearFolderPath}/${fileName}" )
 
@@ -137,7 +141,7 @@ class WeeklyProject extends JournalProject {
         quarterPage.addPageLink weekPage, true
       }
     } else {
-      logger.info "Quarterly pages are NOT required"
+      logger.info 'Quarterly pages are NOT required'
     }
   }
 }

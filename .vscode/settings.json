@@ -4,11 +4,23 @@
     "properties"
   ],
   "cSpell.words": [
+    "Chrono",
+    "GRAPHVIZ",
+    "Millis",
     "bcdghjntv",
+    "classname",
+    "classpath",
+    "codehaus",
     "doxyfile",
     "excludesfile",
+    "expando",
     "fileset",
     "mkdir",
+    "picocli",
+    "println",
+    "refman",
+    "taskdef",
+    "tmpdir",
     "todir",
     "webdoxy"
   ],
