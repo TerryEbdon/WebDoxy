@@ -1,6 +1,7 @@
 package net.ebdon.webdoxy;
 
 import java.time.temporal.IsoFields;
+import java.time.temporal.ChronoUnit;
 import groovy.ant.AntBuilder          // AntBuilder has moved.
 import org.codehaus.groovy.ant.FileScanner
 import groovy.cli.picocli.CliBuilder;
@@ -149,6 +150,8 @@ class WebDoxy {
 
       def after = System.currentTimeMillis()
       logger.info "WebDoxy run completed in ${(after-before)/1000} seconds"
+    } else {
+      logger.warn 'No options provided, nothing to do.'
     }
   }
 
@@ -213,8 +216,9 @@ class WebDoxy {
   }
 
   void addDiaryPage() {
+    logger.info "Adding journal page to projects in list: $projects"
     projects.each { projectName ->
-      logger.info "Adding journal page to: $projectName"
+      logger.info "Adding journal page to project: $projectName"
 
       Date pageDate = targetDate
 
@@ -260,28 +264,31 @@ class WebDoxy {
   }
 
   void addWeeklyPage() {
+    logger.info "Adding weekly page to projects: ${projects}"
     projects.each { projectName ->
       logger.info "Adding weekly page to: $projectName"
       def pageDate = targetDate
 
       logger.info 'Creating a weekly page'
-      final zonedDate = pageDate.toZonedDateTime()
-      final pageYear = zonedDate.get( IsoFields.WEEK_BASED_YEAR )
-      final pageWeek = zonedDate.get( IsoFields.WEEK_OF_WEEK_BASED_YEAR )
+      final zonedPageDate = pageDate.toZonedDateTime()
+      final pageYear      = zonedPageDate.get( IsoFields.WEEK_BASED_YEAR )
+      final pageWeek      = zonedPageDate.get( IsoFields.WEEK_OF_WEEK_BASED_YEAR )
 
       logger.info "Creating a weekly page for year $pageYear, week $pageWeek"
       logger.info "Max pages allowed: $maxPages"
 
       final int numPagesWanted = cliOptions.number ?: 1
       logger.info "Generating $numPagesWanted journal pages with increment of $dateIncrement."
-
       if ( numPagesWanted > 0 && numPagesWanted <= maxPages ) {
-        new WeeklyProject( projectName, buildConfig ).with {
+        try {
+          final WeeklyProject weekProj = new WeeklyProject( projectName, buildConfig )
           numPagesWanted.times {
-            logger.info "Generating weekly page for ${pageDate}"
-            createPage( pageDate )
-            pageDate += dateIncrement
+            weekProj.createPage( pageDate )
+            zonedPageDate.plus( dateIncrement, ChronoUnit.DAYS)
           }
+        } catch ( final Exception ex ) {
+          logger.fatal "Failed to create weekly pages - ${ex.message}"
+          throw ex
         }
       } else {
         ant.fail(
@@ -321,7 +328,7 @@ class WebDoxy {
       logger.info   "buildConfig.doxygen.ant.classPath $buildConfig.doxygen.ant.classPath"
       logger.debug  "buildConfig.doxygen.ant.className $buildConfig.doxygen.ant.className"
       ant.taskdef(
-        name: "doxygen",
+        name: 'doxygen',
         classname: buildConfig.doxygen.ant.className,
         classpath: buildConfig.doxygen.ant.classPath
       )

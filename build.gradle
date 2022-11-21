@@ -76,6 +76,15 @@ jacocoTestCoverageVerification {
   violationRules {
     rule {
       element  = 'CLASS'
+      includes = ['net.ebdon.webdoxy.Backup']
+      limit {
+        counter = 'LINE'
+        value   = 'COVEREDRATIO'
+        minimum = 0.8
+      }
+    }
+    rule {
+      element  = 'CLASS'
       includes = ['net.ebdon.webdoxy.Resource']
       limit {
         counter = 'LINE'
@@ -85,11 +94,11 @@ jacocoTestCoverageVerification {
     }
     rule {
       element  = 'CLASS'
-      includes = ['net.ebdon.webdoxy.Backup']
+      includes = ['net.ebdon.webdoxy.WebDoxy']
       limit {
         counter = 'LINE'
         value   = 'COVEREDRATIO'
-        minimum = 0.8
+        minimum = 0.2
       }
     }
   }
