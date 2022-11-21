@@ -31,7 +31,6 @@ class JournalProject extends Project {
 
   JournalProject( projectName, buildConfig ) {
     super( projectName, buildConfig )
-    final SimpleDateFormat anchorFormat = dateFormatter( 'anchor.day' )
   }
 
   def getPageDate() {

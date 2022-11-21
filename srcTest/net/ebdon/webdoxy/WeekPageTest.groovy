@@ -22,23 +22,26 @@ import groovy.test.GroovyTestCase;
  */
 
 @groovy.util.logging.Log4j2('logger')
-class WeeklyProjectTest extends GroovyTestCase {
+class WeekPageTest extends GroovyTestCase {
 
   final private static Map config = [
     project: [
       journal: [
         format: [
+          'shorter':   'dd-MMM-yyyy', // @todo Eliminate test dependency on JournalProject
           'anchorDay': 'yyyyMMdd'
         ]
       ]
     ]
   ];
 
-  void testStartOfWeek() {
-    final Date monday =
-      new WeeklyProject( 'Fred', config ).
-        startOfWeek( new Date(2022 - 1900,11 - 1,20,22,38) )
-    assert monday.day == 1
+  void testGetPageTitle() {
+    JournalProject journalProject = new JournalProject( 'test project', config )
+      //< @todo Eliminate test dependency on JournalProject
+    final String pageTitle =
+      new WeekPage( journalProject, new File('.') ).pageTitle
+    logger.debug "Got page title as >${pageTitle}<"
+    assert pageTitle.length > 2
   }
 }
 
