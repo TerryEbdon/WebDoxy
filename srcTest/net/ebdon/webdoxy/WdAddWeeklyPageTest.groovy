@@ -37,7 +37,7 @@ class WdAddWeeklyPageTest extends GroovyTestCase {
     project: [
       journal: [
         format: [
-          'anchor.day': 'yyyyMMdd'
+          'anchorDay': 'yyyyMMdd'
         ]
       ]
     ]
@@ -68,7 +68,6 @@ class WdAddWeeklyPageTest extends GroovyTestCase {
     configSlurperMock = new MockFor( ConfigSlurper )
     weeklyProjectMock = new MockFor( WeeklyProject )
 
-    configSlurperMock = new MockFor( ConfigSlurper )
     configSlurperMock.demand.parse { final URL url ->
       assert url.file ==~ '.*config.groovy$'
       logger.trace 'configSlurperMock.demand.parse called'
@@ -87,7 +86,6 @@ class WdAddWeeklyPageTest extends GroovyTestCase {
     }
 
     weeklyProjectMock.demand.with {
-      getBuildConfig { config }
       createPage { final Date date ->
         logger.debug "WeeklyProjectMock.createPage called for date: $date"
       }
