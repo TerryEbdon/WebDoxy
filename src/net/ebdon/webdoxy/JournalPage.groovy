@@ -139,7 +139,7 @@ class JournalPage {
     project.dateFormatter( 'longer' )
   }
 
-  def append( final content ) {
+  void append( final String content ) {
     assert pageFile
     if ( this.class.name.contains( 'Month' ) ) {
       logger.debug "Appending to: $pageFile"

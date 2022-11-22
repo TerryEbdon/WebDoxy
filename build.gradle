@@ -76,15 +76,6 @@ jacocoTestCoverageVerification {
   violationRules {
     rule {
       element  = 'CLASS'
-      includes = ['net.ebdon.webdoxy.Backup']
-      limit {
-        counter = 'LINE'
-        value   = 'COVEREDRATIO'
-        minimum = 0.8
-      }
-    }
-    rule {
-      element  = 'CLASS'
       includes = ['net.ebdon.webdoxy.Resource']
       limit {
         counter = 'LINE'
@@ -94,11 +85,57 @@ jacocoTestCoverageVerification {
     }
     rule {
       element  = 'CLASS'
-      includes = ['net.ebdon.webdoxy.WebDoxy']
+      includes = [
+        'net.ebdon.webdoxy.WeekPage',
+      ]
+      limit {
+        counter = 'LINE'
+        value   = 'COVEREDRATIO'
+        minimum = 0.9
+      }
+    }
+    rule {
+      element  = 'CLASS'
+      includes = ['net.ebdon.webdoxy.Backup']
+      limit {
+        counter = 'LINE'
+        value   = 'COVEREDRATIO'
+        minimum = 0.8
+      }
+    }
+    rule {
+      element  = 'CLASS'
+      includes = [
+        'net.ebdon.webdoxy.JournalPage',
+      ]
+      limit {
+        counter = 'LINE'
+        value   = 'COVEREDRATIO'
+        minimum = 0.3
+      }
+    }
+    rule {
+      element  = 'CLASS'
+      includes = [
+        'net.ebdon.webdoxy.WebDoxy',
+        'net.ebdon.webdoxy.JournalProject',
+      ]
       limit {
         counter = 'LINE'
         value   = 'COVEREDRATIO'
         minimum = 0.2
+      }
+    }
+    rule {
+      element  = 'CLASS'
+      includes = [
+        'net.ebdon.webdoxy.WeeklyProject',
+        'net.ebdon.webdoxy.Project',
+      ]
+      limit {
+        counter = 'LINE'
+        value   = 'COVEREDRATIO'
+        minimum = 0.1
       }
     }
   }

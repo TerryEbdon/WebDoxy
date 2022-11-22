@@ -1,6 +1,8 @@
 package net.ebdon.webdoxy;
 
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.time.Instant;
 import groovy.transform.TypeChecked;
 
 /**
@@ -30,19 +32,26 @@ class WeekPage extends JournalPage {
   String pageAnchor
 
   @TypeChecked
-  WeekPage( JournalProject jp, File file ) {
+  WeekPage( WeeklyProject jp, File file ) {
     super( jp, file )
     logger.debug 'WeekPage instantiated.'
   }
 
-  // @TypeChecked
+  @TypeChecked
   String getPageTitle() {
-    final Date sunday = project.pageDate + 6
+    WeeklyProject wp = (WeeklyProject) project
+    logger.debug "Getting weekly page title for $project.zonedDate.dayOfWeek $project.zonedDate"
+    final ZonedDateTime monday = wp.startOfWeek( project.zonedDate ).toZonedDateTime()
+    final ZonedDateTime sunday = monday.plusDays( 6 )
+    logger.debug "Monday of project week is     $monday.dayOfWeek $monday, "
+    logger.debug "Sunday of project week is     $sunday.dayOfWeek $sunday"
 
     logger.info "Creating weekly page title for year $pageYear, week $pageWeek"
 
     pageAnchor = "y${pageYear}_w${pageWeek}"
-    "# ${project.monthTitle( project.pageDate, sunday )} -- $pageYear week $pageWeek {#$pageAnchor}"
+    final String monthTitle = project.monthTitle( monday, sunday )
+
+    "# $monthTitle -- $pageYear week $pageWeek {#$pageAnchor}"
   }
 
   @Override
@@ -52,19 +61,21 @@ class WeekPage extends JournalPage {
 
   @Override
   def createSkeletonBody() {
-
-    Date dayInWeek = pageDate
+    ZonedDateTime dayInWeek = zonedDate
     7.times {
-      append dayHeader( dayInWeek++ )
+      append dayHeader( dayInWeek )
+      dayInWeek.plusDays( 1 )
     }
   }
 
-  String dayHeader( final Date dayInWeek) {
+  private String dayHeader( final ZonedDateTime zonedDayInWeek) {
     final SimpleDateFormat pageDateFormat1 =
       new SimpleDateFormat( "## dd EEEE" )
 
     final SimpleDateFormat pageDateFormat2 =
       new SimpleDateFormat( "{#${anchorDateFormat}}\n" )
+
+    final Date dayInWeek = Date.from( zonedDayInWeek.toInstant() )
 
     pageDateFormat1.format( dayInWeek ).padRight( 16 ) +
     pageDateFormat2.format( dayInWeek )

@@ -2,6 +2,8 @@ package net.ebdon.webdoxy;
 
 import java.text.SimpleDateFormat;
 import java.time.temporal.IsoFields;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import groovy.transform.TypeChecked;
 
 /**
@@ -46,6 +48,20 @@ class JournalProject extends Project {
 
     // println "startMonth: $startMonth"
     // println "endMonth:   $endMonth"
+
+    startMonth == endMonth ? startMonth : "$startMonth / $endMonth"
+  }
+
+  @TypeChecked
+  final String monthTitle( final ZonedDateTime monday, final ZonedDateTime sunday ) {
+
+    logger.debug "monthTitle(): monday=${monday.format( DateTimeFormatter.RFC_1123_DATE_TIME )}"
+    logger.debug "monthTitle(): sunday=${sunday.format( DateTimeFormatter.RFC_1123_DATE_TIME )}"
+    final String startMonth = monday.format( 'MMM' )
+    final String endMonth   = sunday.format( 'MMM' )
+
+    logger.debug "startMonth: $startMonth"
+    logger.debug "endMonth:   $endMonth"
 
     startMonth == endMonth ? startMonth : "$startMonth / $endMonth"
   }
