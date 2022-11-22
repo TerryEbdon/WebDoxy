@@ -63,7 +63,7 @@ class MonthSummaryPage extends JournalPage {
       new SimpleDateFormat( '''|[EEE dd](\\'ref' 'day'_yyyy_MM_dd) | |''' )
     dayInMonth = new Date( pageDate.year, pageDate.month, 1 )
 
-    1.upto( lastDateOfMonth ) { 
+    1.upto( lastDateOfMonth ) {
       append weekNumberColumn() + pageDateFormat.format( dayInMonth++ )
     }
   }

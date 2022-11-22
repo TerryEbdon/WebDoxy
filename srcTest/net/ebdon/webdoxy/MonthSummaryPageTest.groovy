@@ -22,44 +22,34 @@ import groovy.test.GroovyTestCase;
  */
 
 @groovy.util.logging.Log4j2('logger')
-class WeekPageTest extends GroovyTestCase {
+class MonthSummaryPageTest extends GroovyTestCase {
 
   final private static Map config = [
     project: [
       journal: [
         format: [
-          'shorter':   'dd-MMM-yyyy', // @todo Eliminate test dependency on WeeklyProject
-          'anchorDay': 'yyyyMMdd'
+          month:          'YYYY-MM',
+          anchorMonth:    'yyyyMM',
         ]
       ]
     ]
   ];
 
-  WeeklyProject weeklyProject;
-  WeekPage weekPage;
 
-  void testGetPageTitle() {
-    weeklyProject = new WeeklyProject( 'test project', config )
-      //< @todo Eliminate test dependency on WeeklyProject
-    weekPage = new WeekPage( weeklyProject, new File('.') )
-    final String pageTitle = weekPage.pageTitle
-    logger.debug "Got page title as >${pageTitle}<"
-    assert pageTitle.length() > 2
-  }
-
-  void testCreateSkeletonBody() {
-    weeklyProject = new WeeklyProject( 'test project', config )
-    File markdownOutput = new File('logs/WeekPageTest.txt')
+   void testCreateSkeletonBody() {
+    WeeklyProject weeklyProject = new WeeklyProject( 'test project', config )
+    File markdownOutput = new File('logs/MonthSummaryPageTest.txt')
     markdownOutput.deleteOnExit()
     if ( markdownOutput.exists() ) {
       logger.debug 'Temp markdown file exists pre-test, deleting it.'
       markdownOutput.delete()
     }
-    weekPage = new WeekPage( weeklyProject, markdownOutput )
+    final MonthSummaryPage monthSummaryPage =
+      new MonthSummaryPage( weeklyProject, markdownOutput )
 
-    weekPage.createSkeletonBody()
+    monthSummaryPage.createSkeletonBody()
     assert markdownOutput.exists()
-    logger.debug "WeekPage file size: ${markdownOutput.length()}"
+    logger.debug "monthSummaryPage file size: ${markdownOutput.length()}"
     assert 245 == markdownOutput.length()
   }
 }

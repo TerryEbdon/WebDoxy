@@ -3,6 +3,7 @@ package net.ebdon.webdoxy;
 import java.text.SimpleDateFormat;
 import java.time.temporal.IsoFields;
 import java.time.ZonedDateTime;
+import groovy.transform.TypeChecked;
 
 /**
  * @file
@@ -31,10 +32,6 @@ class WeeklyProject extends JournalProject {
     super( projectName, buildConfig )
   }
 
-  ZonedDateTime getZonedDate() {
-    pageDate.toZonedDateTime()
-  }
-
   int getPageWeek() {
     zonedDate.get( IsoFields.WEEK_OF_WEEK_BASED_YEAR )
   }
@@ -50,8 +47,13 @@ class WeeklyProject extends JournalProject {
     "# ${monthTitle( pageDate, sunday )} -- $pageYear week $pageWeek $pageAnchor"
   }
 
+  @TypeChecked
   Date startOfWeek( final Date date ) {
-    final ZonedDateTime dayInTargetWeek = date.toZonedDateTime()
+    startOfWeek( date.toZonedDateTime() )
+  }
+
+  @TypeChecked
+  Date startOfWeek( final ZonedDateTime dayInTargetWeek ) {
     final int dayNumber = dayInTargetWeek.dayOfWeek.value // 0=Monday, 7=Sunday
     logger.trace "Day number: $dayNumber"
 
@@ -98,7 +100,7 @@ class WeeklyProject extends JournalProject {
       addPageToQuarter  page
       addPageToMonth    page, false
     } else {
-      logger.warn   message( 'JournalProject.nothingToDo' )
+      logger.warn   resource.message( 'JournalProject.nothingToDo' )
       logger.debug  " --> ${pageFile.absolutePath}"
     }
   }

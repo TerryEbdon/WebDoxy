@@ -1,5 +1,7 @@
 package net.ebdon.webdoxy;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import groovy.test.GroovyTestCase;
 
 /**
@@ -24,6 +26,11 @@ import groovy.test.GroovyTestCase;
 @groovy.util.logging.Log4j2('logger')
 class WeeklyProjectTest extends GroovyTestCase {
 
+  final private static targetYear             = 2022
+  final private static targetDayOfMonth       = 20
+  final private static expectMondayDayOfMonth = 14
+  final private static yearOffset             = 1900
+  
   final private static Map config = [
     project: [
       journal: [
@@ -35,10 +42,31 @@ class WeeklyProjectTest extends GroovyTestCase {
   ];
 
   void testStartOfWeek() {
+    logger.debug 'testStartOfWeek'
+    final Date targetDate = new Date(targetYear - yearOffset,11 - 1,targetDayOfMonth,22,38) 
+    logger.debug "Target week contains:     $targetDate"
     final Date monday =
       new WeeklyProject( 'Fred', config ).
-        startOfWeek( new Date(2022 - 1900,11 - 1,20,22,38) )
+        startOfWeek( targetDate)
+
+    logger.debug "Start of containing week: $monday"
     assert monday.day == 1
   }
-}
 
+  void testStartOfWeekZoned() {
+    logger.debug 'testStartOfWeekZoned'
+    final ZoneId zoneId = ZoneId.of('Etc/UTC')
+    final ZonedDateTime targetDate = ZonedDateTime.of(
+      targetYear,11,targetDayOfMonth,22,38,0,0, zoneId )
+    final String targetDayOfWeek = targetDate.dayOfWeek.toString()[0..2]
+    logger.debug "Target week contains:     $targetDayOfWeek $targetDate"
+
+    final Date monday =
+      new WeeklyProject( 'Fred', config ).
+        startOfWeek( targetDate )
+    logger.debug "Start of containing week: $monday"
+    assert monday.day  == 1
+    assert monday.date == expectMondayDayOfMonth
+    assert monday.year == targetYear - yearOffset
+  }
+}

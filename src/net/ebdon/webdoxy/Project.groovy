@@ -1,7 +1,9 @@
 package net.ebdon.webdoxy;
 
 import java.text.SimpleDateFormat;
-import groovy.ant.AntBuilder;         // AntBuilder has moved.
+import groovy.ant.AntBuilder;
+import java.time.ZonedDateTime;
+import groovy.transform.TypeChecked;
 
 /**
  * @file
@@ -32,12 +34,16 @@ import groovy.ant.AntBuilder;         // AntBuilder has moved.
  @todo Move all message strings into Language.properties
  */
 
+// @groovy.transform.ToString( ignoreNulls = true, includes=['name', 'zonedDate'] )
+@groovy.transform.ToString( includes=['name', 'zonedDate'] )
 @groovy.util.logging.Log4j2('logger')
 class Project {
   final String name;
   final def buildConfig;  //!< @see config.groovy
   final Resource resource = new Resource();
   final AntBuilder ant;
+
+  private final Date thePageDate = new Date()
 
   Project( String pn, bc ) {
     assert pn.length()
@@ -123,7 +129,12 @@ class Project {
   def getPageDate() {
     final SimpleDateFormat pageDateFormat =
       new SimpleDateFormat( buildConfig.project.page.dateFormat )
-    def pageDate = pageDateFormat.format( new Date() )
+    def pageDate = pageDateFormat.format( thePageDate )
+  }
+
+  @TypeChecked
+  ZonedDateTime getZonedDate() {
+    thePageDate.toZonedDateTime()
   }
 
   def getStubListPageName() {
@@ -231,8 +242,4 @@ class Project {
     "$rootFolder/$buildConfig.project.parentfolders.image"
   }
 
-  String toString() {
-    "Name: $name, config file: $configFileName, outRoot: $outRoot, " +
-    "htmlFolder: $htmlFolder, sourceFolder: $sourceFolder"
-  }
 }
