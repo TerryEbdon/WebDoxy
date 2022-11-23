@@ -203,15 +203,18 @@ class WebDoxy {
   }
 
   void stubs() {
+    if ( cliOptions.arguments().size ) {
+      logger.info "Adding stubs to projects: ${projects.join(', ')}"
+      logger.info "Stubs are: ${cliOptions.arguments()}"
 
-    logger.info "Adding stubs to projects: ${projects.join(', ')}"
-    logger.info "Stubs are: ${cliOptions.arguments()}"
-
-    projects.each { projectName ->
-      Project project = new Project( projectName, buildConfig )
-      cliOptions.arguments().each { pageName ->
-        project.createStub pageName
+      projects.each { projectName ->
+        Project project = new Project( projectName, buildConfig )
+        cliOptions.arguments().each { pageName ->
+          project.createStub pageName
+        }
       }
+    } else {
+      logger.warn resource.message( 'webDoxy.stubs.noStubList' )
     }
   }
 
