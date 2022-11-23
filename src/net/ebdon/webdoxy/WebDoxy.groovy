@@ -5,6 +5,7 @@ import java.time.temporal.ChronoUnit;
 import groovy.ant.AntBuilder          // AntBuilder has moved.
 import org.codehaus.groovy.ant.FileScanner
 import groovy.cli.picocli.CliBuilder;
+import java.text.SimpleDateFormat;
 
 /**
  * @file
@@ -116,6 +117,9 @@ class WebDoxy {
         cli.usage()
         return
       }
+      
+      build.initDoxygen()
+
       if ( options.create ) {
         build.create()
       }
@@ -172,7 +176,6 @@ class WebDoxy {
       }
 
       cliOptions = options
-      initDoxygen()
     } else {
       ant.fail(
         resource.message(
@@ -251,7 +254,7 @@ class WebDoxy {
     Date pageDate = new Date()
 
     if ( cliOptions.date ) {
-      pageDate = Date.parse( buildConfig.datePattern, cliOptions.date )
+      pageDate = new SimpleDateFormat( buildConfig.datePattern ).parse( cliOptions.date )
     } else {
       logger.warn 'Date not specified, defaulting to today.'
     }
