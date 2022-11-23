@@ -24,16 +24,10 @@ import groovy.ant.AntBuilder;
  */
 
 @groovy.util.logging.Log4j2('logger')
-class WdAddWeeklyPageTest extends GroovyTestCase {
+class WebDoxyTest extends GroovyTestCase {
 
   final private static Map config = [
-    doxygen: [
-      path: '.',
-      ant: [
-        classPath: '.',
-        className: 'dummy doxygen class name'
-      ]
-    ],
+    datePattern:'yyyy-MM-dd',
     project: [
       journal: [
         format: [
@@ -45,33 +39,32 @@ class WdAddWeeklyPageTest extends GroovyTestCase {
 
   private MockFor resourceMock;
   private MockFor configSlurperMock;
-  private MockFor weeklyProjectMock;
 
-  void testAddWeeklyPage() {
-    logger.trace 'Start of testAddWeeklyPage()'
-    final Expando options = new Expando(
+  Expando options;
+
+  @Override
+  void setUp() {
+    options = new Expando(
       project  : false,
       create   : false,
       journal  : false,
-      week     : { logger.debug 'week: true'; true },
+      week     : false,
       validate : false,
       generate : false,
       toc      : false,
       backup   : false,
       stub     : false,
-      arguments: { ['Fred'] }
+      arguments: {['Fred']},
     )
 
     resourceMock      = new MockFor( Resource )
     configSlurperMock = new MockFor( ConfigSlurper )
-    weeklyProjectMock = new MockFor( WeeklyProject )
 
     configSlurperMock.demand.parse { final URL url ->
       assert url.file ==~ '.*config.groovy$'
-      logger.trace 'configSlurperMock.demand.parse called'
+      logger.debug 'configSlurperMock.demand.parse called'
       config
     }
-
 
     resourceMock.demand.message { final String key, final Object[] args ->
       final String returnVal = "Resource.message() called with key $key & args $args"
@@ -79,19 +72,32 @@ class WdAddWeeklyPageTest extends GroovyTestCase {
       assert key == 'backup.copyDriveOffline'
       returnVal
     }
+  }
 
-    weeklyProjectMock.demand.with {
-      createPage { final Date date ->
-        logger.debug "WeeklyProjectMock.createPage called for date: $date"
-      }
-    }
-
+  void testGetTargetDateDefault() {
+    logger.debug 'Start of testGetTargetDateDefault()'
     configSlurperMock.use {
-      weeklyProjectMock.use {
-        WebDoxy build = new WebDoxy( options )
-        build.addWeeklyPage()
-      }
+      WebDoxy build = new WebDoxy( options )
+      final Date parsedDate = build.getTargetDate()
+      logger.debug "target date returned as: $parsedDate"
+      assert parsedDate
     }
-    logger.trace 'End of testAddWeeklyPage()'
+    logger.debug 'End of testGetTargetDateDefault()'
+  }
+
+  void testGetTargetDateFromOption() {
+    logger.debug 'Start of testGetTargetDateFromOption()'
+    configSlurperMock.use {
+      options.date = '1999-01-01'
+      WebDoxy build = new WebDoxy( options )
+      final Date parsedDate = build.getTargetDate()
+      logger.debug "target date returned as: $parsedDate"
+      assert parsedDate
+      assert 99 == parsedDate.year
+      assert  0 == parsedDate.month
+      assert  1 == parsedDate.date
+      assert  5 == parsedDate.day
+    }
+    logger.debug 'End of testGetTargetDateFromOption()'
   }
 }

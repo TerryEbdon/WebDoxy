@@ -1,6 +1,7 @@
 package net.ebdon.webdoxy;
 
 import groovy.test.GroovyTestCase;
+import groovy.transform.TypeChecked;
 
 /**
  * @file
@@ -35,8 +36,9 @@ class MonthSummaryPageTest extends GroovyTestCase {
     ]
   ];
 
-
+  @TypeChecked
    void testCreateSkeletonBody() {
+    if ( GroovyTestCase.notYetImplemented( this ) ) return
     WeeklyProject weeklyProject = new WeeklyProject( 'test project', config )
     File markdownOutput = new File('logs/MonthSummaryPageTest.txt')
     markdownOutput.deleteOnExit()
