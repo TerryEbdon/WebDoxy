@@ -6,6 +6,7 @@ import groovy.ant.AntBuilder          // AntBuilder has moved.
 import org.codehaus.groovy.ant.FileScanner
 import groovy.cli.picocli.CliBuilder;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
 
 /**
  * @file
@@ -234,9 +235,11 @@ class WebDoxy {
 
       if ( numPagesWanted > 0 && numPagesWanted <= maxPages ) {
         new JournalProject( projectName, buildConfig ).with {
+          ZonedDateTime zonedPageDate = pageDate.toZonedDateTime()
           numPagesWanted.times {
             logger.info "Generating journal page for ${pageDate}"
-            createPage( pageDate++ )
+            createPage( zonedPageDate )
+            zonedPageDate = zonedPageDate.plusDays( 1 )
           }
         }
       } else {
@@ -289,7 +292,7 @@ class WebDoxy {
         try {
           final WeeklyProject weekProj = new WeeklyProject( projectName, buildConfig )
           numPagesWanted.times {
-            weekProj.createPage( pageDate )
+            weekProj.createPage( pageDate ) // @bug if > 1 page then all have same date.
             zonedPageDate.plus( dateIncrement, ChronoUnit.DAYS)
           }
         } catch ( final Exception ex ) {
