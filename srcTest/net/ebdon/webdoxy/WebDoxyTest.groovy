@@ -3,6 +3,8 @@ package net.ebdon.webdoxy;
 import groovy.test.GroovyTestCase;
 import groovy.mock.interceptor.MockFor;
 import groovy.ant.AntBuilder;
+import java.time.ZonedDateTime;
+import java.time.LocalDate;
 
 /**
  * @file
@@ -33,12 +35,13 @@ class WebDoxyTest extends GroovyTestCase {
         format: [
           'anchorDay': 'yyyyMMdd'
         ]
-      ]
+      ],
     ]
   ];
 
   private MockFor resourceMock;
   private MockFor configSlurperMock;
+  private MockFor journalProjectMock;
 
   Expando options;
 
@@ -59,6 +62,7 @@ class WebDoxyTest extends GroovyTestCase {
 
     resourceMock      = new MockFor( Resource )
     configSlurperMock = new MockFor( ConfigSlurper )
+    journalProjectMock = new MockFor( JournalProject )
 
     configSlurperMock.demand.parse { final URL url ->
       assert url.file ==~ '.*config.groovy$'
@@ -99,5 +103,84 @@ class WebDoxyTest extends GroovyTestCase {
       assert  5 == parsedDate.day
     }
     logger.debug 'End of testGetTargetDateFromOption()'
+  }
+
+  void testAddDiaryPageWithDate() {
+    logger.debug 'Start of testAddDiaryPageWithDate()'
+    if ( GroovyTestCase.notYetImplemented( this ) ) {
+      logger.fatal '** TEST NOT YET IMPLEMENTED **'
+      return
+    }
+    assert false
+    logger.debug 'End of testAddDiaryPageWithDate()'
+  }
+
+  void testAddDiaryPageDateRange() {
+    logger.debug 'Start of testAddDiaryPageDateRange()'
+    final int numPagesWanted = 7
+    final ZonedDateTime today     = ZonedDateTime.now()
+    final ZonedDateTime yesterday = today.minusDays( 1 )
+    // final ZonedDateTime startDate = today
+    // final ZonedDateTime endDate   = startDate.plusDays( numPagesWanted )
+  
+    Map<Integer,ZonedDateTime> expectedPageDates=[:]
+    1.upto( numPagesWanted ) { dayNumber ->
+      expectedPageDates[ dayNumber ] = yesterday.plusDays( dayNumber )
+    }
+    assert expectedPageDates.size() == numPagesWanted
+
+    options.number = numPagesWanted
+    buildPages( today, expectedPageDates )
+
+    logger.debug 'End of testAddDiaryPageDateRange()'
+  }
+
+  private buildPages(
+      final ZonedDateTime firstPageDateWanted = ZonedDateTime.now(),
+      final Map<Integer,ZonedDateTime> expectedPageDates = [1: firstPageDateWanted] ) {
+
+    Map<Integer,LocalDate> expectedLocalDates = [:]
+    
+    expectedPageDates.each { key, zonedDate ->
+      expectedLocalDates[ key ] = zonedDate.toLocalDate()
+    }
+
+    assert expectedPageDates.size() == expectedLocalDates.size()
+    final int expectedPageCount = expectedLocalDates.size()
+
+    int currentPageNum = 0
+
+    logger.info "Expecting $expectedPageCount pages starting with $firstPageDateWanted"
+
+    journalProjectMock.demand.with {
+      'with'(1) { Closure closure -> closure() }
+      createPage(0) { final ZonedDateTime zdtPageDate ->
+        logger.debug "journalProjectMock.createPage called for zoned date: $date"
+      }
+
+      createPage(0) { final Date date ->
+        logger.debug "journalProjectMock.createPage called for date: $date"
+      }
+    }
+
+    configSlurperMock.use {
+      journalProjectMock.use {
+        WebDoxy build = new WebDoxy( options ) {
+          void createPage( final ZonedDateTime dateOfPageToCreate ) {
+            ++currentPageNum
+            assert currentPageNum <= expectedPageDates.size()
+            logger.debug "Fake createPage No. $currentPageNum with ZonedDateTime: $dateOfPageToCreate"
+            assert expectedLocalDates[ currentPageNum ] == dateOfPageToCreate.toLocalDate()
+          }
+        }.addDiaryPage()
+        // build.addDiaryPage()
+      }
+    }
+  }
+
+  void testAddDiaryPageDefaultDate() {
+    logger.debug 'Start of testAddDiaryPageDefaultDate()'
+      buildPages()
+    logger.debug 'End of testAddDiaryPageDefaultDate()'
   }
 }

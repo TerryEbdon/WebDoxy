@@ -34,9 +34,9 @@ project {
 	outRoot          = 'output'
 
 	parentfolders {
-		source   = "source"
-		html     = "html"
-		latex    = "latex"
+		source   = 'source'
+		html     = 'html'
+		latex    = 'latex'
 		image    = 'images'
 		dia      = 'dia'
 		examples = [ 'static-html', 'include' ]

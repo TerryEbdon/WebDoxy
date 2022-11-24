@@ -74,6 +74,11 @@ class JournalProject extends Project {
     "${fullFolderPath}${pageFileName}"
   }
 
+  @TypeChecked
+  void createPage( final ZonedDateTime zdtPageDate ) {
+    createPage Date.from( zdtPageDate.toInstant() )
+  }
+
   def createPage( Date date ) {
     pageDate = date
 
