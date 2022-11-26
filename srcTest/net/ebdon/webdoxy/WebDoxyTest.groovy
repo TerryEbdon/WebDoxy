@@ -173,14 +173,13 @@ class WebDoxyTest extends GroovyTestCase {
             assert expectedLocalDates[ currentPageNum ] == dateOfPageToCreate.toLocalDate()
           }
         }.addDiaryPage()
-        // build.addDiaryPage()
       }
     }
   }
 
   void testAddDiaryPageDefaultDate() {
     logger.debug 'Start of testAddDiaryPageDefaultDate()'
-      buildPages()
+    buildPages()
     logger.debug 'End of testAddDiaryPageDefaultDate()'
   }
 }

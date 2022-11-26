@@ -2,6 +2,8 @@ package net.ebdon.webdoxy;
 
 import java.text.SimpleDateFormat;
 import java.time.temporal.IsoFields;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * @file
@@ -96,7 +98,14 @@ class JournalPage {
   }
 
   def createSkeletonHeader() {
+    final DateTimeFormatter commentFormatter =
+      DateTimeFormatter.ofPattern( '''EEE' 'yyyy'-'LL'-'dd' is in ISO 8601 week 'w' of year 'YYYY''')
+    final String pageDateComment =
+      pageDate.toZonedDateTime().format( commentFormatter )
+
+    logger.info pageDateComment
     append "@page ${pageAnchor} $title\n"
+    append "<!-- $pageDateComment -->\n"
     append "@anchor ${h1Anchor}"
     append "# $firstHeaderTitle\n"
   }
