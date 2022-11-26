@@ -19,6 +19,7 @@
     "picocli",
     "println",
     "refman",
+    "sprintf",
     "taskdef",
     "tmpdir",
     "todir",

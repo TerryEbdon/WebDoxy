@@ -25,3 +25,4 @@ atlassian-ide-plugin.xml
 .metadata/
 projects/
 logs/
+issue*.groovy

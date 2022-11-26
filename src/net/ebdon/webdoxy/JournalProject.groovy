@@ -80,10 +80,11 @@ class JournalProject extends Project {
   }
 
   def createPage( Date date ) {
+    logger.debug "Creating page for $date"
     pageDate = date
 
     logger.debug "fullFolderPath: $fullFolderPath"
-    logger.debug "Full path: $fullPath"
+    logger.debug "Full path for $date: $fullPath"
     ant.mkdir dir: fullFolderPath
 
     logger.info "Creating page file: $fullPath"
@@ -95,7 +96,7 @@ class JournalProject extends Project {
       page.create()
       addPageToMonth page
     } else {
-      logger.warn  message( 'JournalProject.nothingToDo' )
+      logger.warn  resource.message( 'JournalProject.nothingToDo' )
       logger.debug " --> ${pageFile.absolutePath}"
     }
   }
