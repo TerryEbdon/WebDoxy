@@ -2,7 +2,6 @@ package net.ebdon.webdoxy;
 
 import groovy.test.GroovyTestCase;
 import groovy.mock.interceptor.MockFor;
-import groovy.ant.AntBuilder;
 import java.time.ZonedDateTime;
 import java.time.LocalDate;
 
@@ -43,10 +42,11 @@ class WebDoxyTest extends GroovyTestCase {
   private MockFor configSlurperMock;
   private MockFor journalProjectMock;
 
-  Expando options;
+  private Expando options;
 
   @Override
   void setUp() {
+    super.setUp()
     options = new Expando(
       project  : false,
       create   : false,
@@ -57,7 +57,7 @@ class WebDoxyTest extends GroovyTestCase {
       toc      : false,
       backup   : false,
       stub     : false,
-      arguments: {['Fred']},
+      arguments: { ['Fred'] },
     )
 
     resourceMock      = new MockFor( Resource )
@@ -82,7 +82,7 @@ class WebDoxyTest extends GroovyTestCase {
     logger.debug 'Start of testGetTargetDateDefault()'
     configSlurperMock.use {
       WebDoxy build = new WebDoxy( options )
-      final Date parsedDate = build.getTargetDate()
+      final Date parsedDate = build.targetDate
       logger.debug "target date returned as: $parsedDate"
       assert parsedDate
     }
@@ -94,7 +94,7 @@ class WebDoxyTest extends GroovyTestCase {
     configSlurperMock.use {
       options.date = '1999-01-01'
       WebDoxy build = new WebDoxy( options )
-      final Date parsedDate = build.getTargetDate()
+      final Date parsedDate = build.targetDate
       logger.debug "target date returned as: $parsedDate"
       assert parsedDate
       assert 99 == parsedDate.year
@@ -120,10 +120,8 @@ class WebDoxyTest extends GroovyTestCase {
     final int numPagesWanted = 7
     final ZonedDateTime today     = ZonedDateTime.now()
     final ZonedDateTime yesterday = today.minusDays( 1 )
-    // final ZonedDateTime startDate = today
-    // final ZonedDateTime endDate   = startDate.plusDays( numPagesWanted )
-  
-    Map<Integer,ZonedDateTime> expectedPageDates=[:]
+
+    Map<Integer,ZonedDateTime> expectedPageDates = [:]
     1.upto( numPagesWanted ) { dayNumber ->
       expectedPageDates[ dayNumber ] = yesterday.plusDays( dayNumber )
     }
@@ -135,12 +133,12 @@ class WebDoxyTest extends GroovyTestCase {
     logger.debug 'End of testAddDiaryPageDateRange()'
   }
 
-  private buildPages(
+  private void buildPages(
       final ZonedDateTime firstPageDateWanted = ZonedDateTime.now(),
       final Map<Integer,ZonedDateTime> expectedPageDates = [1: firstPageDateWanted] ) {
 
     Map<Integer,LocalDate> expectedLocalDates = [:]
-    
+
     expectedPageDates.each { key, zonedDate ->
       expectedLocalDates[ key ] = zonedDate.toLocalDate()
     }
@@ -165,7 +163,7 @@ class WebDoxyTest extends GroovyTestCase {
 
     configSlurperMock.use {
       journalProjectMock.use {
-        WebDoxy build = new WebDoxy( options ) {
+        new WebDoxy( options ) {
           void createPage( final ZonedDateTime dateOfPageToCreate ) {
             ++currentPageNum
             assert currentPageNum <= expectedPageDates.size()

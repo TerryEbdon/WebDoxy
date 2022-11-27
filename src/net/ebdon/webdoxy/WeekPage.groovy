@@ -2,7 +2,6 @@ package net.ebdon.webdoxy;
 
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
-import java.time.Instant;
 import groovy.transform.TypeChecked;
 
 /**
@@ -70,7 +69,7 @@ class WeekPage extends JournalPage {
 
   private String dayHeader( final ZonedDateTime zonedDayInWeek) {
     final SimpleDateFormat pageDateFormat1 =
-      new SimpleDateFormat( "## dd EEEE" )
+      new SimpleDateFormat( '## dd EEEE' )
 
     final SimpleDateFormat pageDateFormat2 =
       new SimpleDateFormat( "{#${anchorDateFormat}}\n" )

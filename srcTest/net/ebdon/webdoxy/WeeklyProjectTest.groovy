@@ -26,12 +26,12 @@ import groovy.test.GroovyTestCase;
 @groovy.util.logging.Log4j2('logger')
 class WeeklyProjectTest extends GroovyTestCase {
 
-  final private static targetYear             = 2022
-  final private static targetDayOfMonth       = 20
-  final private static expectMondayDayOfMonth = 14
-  final private static yearOffset             = 1900
-  
-  final private static Map config = [
+  final private int targetYear             = 2022
+  final private int targetDayOfMonth       = 20
+  final private int expectMondayDayOfMonth = 14
+  final private int yearOffset             = 1900
+
+  final private Map config = [
     project: [
       journal: [
         format: [
@@ -43,7 +43,7 @@ class WeeklyProjectTest extends GroovyTestCase {
 
   void testStartOfWeek() {
     logger.debug 'testStartOfWeek'
-    final Date targetDate = new Date(targetYear - yearOffset,11 - 1,targetDayOfMonth,22,38) 
+    final Date targetDate = new Date(targetYear - yearOffset,11 - 1,targetDayOfMonth,22,38)
     logger.debug "Target week contains:     $targetDate"
     final Date monday =
       new WeeklyProject( 'Fred', config ).

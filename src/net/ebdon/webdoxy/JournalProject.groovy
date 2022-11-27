@@ -1,7 +1,6 @@
 package net.ebdon.webdoxy;
 
 import java.text.SimpleDateFormat;
-import java.time.temporal.IsoFields;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import groovy.transform.TypeChecked;
@@ -39,15 +38,11 @@ class JournalProject extends Project {
     this.pageDate
   }
 
-  String monthTitle( final Date monday, final Date sunday ) {
-
+  final String monthTitle( final Date monday, final Date sunday ) {
     final SimpleDateFormat monthFormat = new SimpleDateFormat( 'MMM' )
 
-    final startMonth = monthFormat.format( monday )
-    final endMonth   = monthFormat.format( sunday )
-
-    // println "startMonth: $startMonth"
-    // println "endMonth:   $endMonth"
+    final String startMonth = monthFormat.format( monday )
+    final String endMonth   = monthFormat.format( sunday )
 
     startMonth == endMonth ? startMonth : "$startMonth / $endMonth"
   }
@@ -57,8 +52,9 @@ class JournalProject extends Project {
 
     logger.debug "monthTitle(): monday=${monday.format( DateTimeFormatter.RFC_1123_DATE_TIME )}"
     logger.debug "monthTitle(): sunday=${sunday.format( DateTimeFormatter.RFC_1123_DATE_TIME )}"
-    final String startMonth = monday.format( 'MMM' )
-    final String endMonth   = sunday.format( 'MMM' )
+    final String monthFormat = 'MMM'
+    final String startMonth  = monday.format( monthFormat )
+    final String endMonth    = sunday.format( monthFormat )
 
     logger.debug "startMonth: $startMonth"
     logger.debug "endMonth:   $endMonth"
@@ -101,7 +97,7 @@ class JournalProject extends Project {
     }
   }
 
-  def addPageToMonth( JournalPage dayPage, boolean subPage = true ) {
+  void addPageToMonth( JournalPage dayPage, boolean subPage = true ) {
     assert dayPage
     if ( buildConfig.project.journal.pages.monthly.required ) {
       final def monthFmtStr = buildConfig.project.journal.pages.monthly.format

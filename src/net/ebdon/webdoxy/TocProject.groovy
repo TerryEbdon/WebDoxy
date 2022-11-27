@@ -1,7 +1,5 @@
 package net.ebdon.webdoxy;
 
-import groovy.ant.AntBuilder          // AntBuilder has moved.
-
 /**
  * @file
  * @author  Terry Ebdon
@@ -47,15 +45,15 @@ class TocProject extends Project {
     buildConfig.project.toc.brief
   }
 
-  def getLatexRequired() {
-    "NO"
+  String getLatexRequired() {
+    'NO'
   }
 
-  def getGenerateTreeView() {
+  String getGenerateTreeView() {
     buildConfig.project.toc.generateTreeView
   }
 
-  def getDisableIndex() {
+  String getDisableIndex() {
     buildConfig.project.toc.disableIndex
   }
 
@@ -78,7 +76,7 @@ class TocProject extends Project {
       }
 
       def indexedProjects = [] // Alphanumeric order, but case sensitive.
-      tocFile << "# Known Projects {#mainpage}\n"
+      tocFile << '# Known Projects {#mainpage}\n'
       for ( file in scanner ) {
         def projectName = file.parentFile.name
         logger.info "Indexing project $projectName"

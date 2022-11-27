@@ -35,7 +35,7 @@ class ProjectTest extends GroovyTestCase {
 
   @TypeChecked
   void testPageDate() {
-    final Project project = new Project( "Test Project", config )
+    final Project project = new Project( 'Test Project', config )
     assert project.thePageDate
     assert project.pageDate
     assert project.zonedDate

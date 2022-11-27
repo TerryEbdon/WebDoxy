@@ -35,8 +35,8 @@ class WeekPageTest extends GroovyTestCase {
     ]
   ];
 
-  WeeklyProject weeklyProject;
-  WeekPage weekPage;
+  private WeeklyProject weeklyProject;
+  private WeekPage weekPage;
 
   void testGetPageTitle() {
     weeklyProject = new WeeklyProject( 'test project', config )

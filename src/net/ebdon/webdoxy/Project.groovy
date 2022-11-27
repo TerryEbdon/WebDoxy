@@ -80,7 +80,8 @@ class Project {
   def getAuthor() {
     buildConfig.project.author
   }
-  def getMarkdownFileType() {
+
+  String getMarkdownFileType() {
     buildConfig.markdown.fileType
   }
 
@@ -88,20 +89,20 @@ class Project {
     configFile << "${key.padRight( 25 )} = ${value}\n"
   }
 
-  def getDisableIndex() {
-    "YES"
+  String getDisableIndex() {
+    'YES'
   }
 
-  def getGenerateTreeView() {
-    "YES"
+  String getGenerateTreeView() {
+    'YES'
   }
 
-  def getHtmlRequired() {
-    "YES"
+  String getHtmlRequired() {
+    'YES'
   }
 
-  def getLatexRequired() {
-    "YES"
+  String getLatexRequired() {
+    'YES'
   }
 
   String getBrief() {
