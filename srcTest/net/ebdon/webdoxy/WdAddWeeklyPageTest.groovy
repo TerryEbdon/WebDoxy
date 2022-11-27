@@ -2,7 +2,6 @@ package net.ebdon.webdoxy;
 
 import groovy.test.GroovyTestCase;
 import groovy.mock.interceptor.MockFor;
-import groovy.ant.AntBuilder;
 
 /**
  * @file
@@ -40,7 +39,7 @@ class WdAddWeeklyPageTest extends GroovyTestCase {
           'anchorDay': 'yyyyMMdd'
         ]
       ]
-    ]
+    ],
   ];
 
   private MockFor resourceMock;
@@ -71,7 +70,6 @@ class WdAddWeeklyPageTest extends GroovyTestCase {
       logger.trace 'configSlurperMock.demand.parse called'
       config
     }
-
 
     resourceMock.demand.message { final String key, final Object[] args ->
       final String returnVal = "Resource.message() called with key $key & args $args"

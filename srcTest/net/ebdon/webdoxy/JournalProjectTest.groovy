@@ -1,7 +1,6 @@
 package net.ebdon.webdoxy;
 
 import groovy.test.GroovyTestCase;
-import java.time.ZonedDateTime;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import groovy.transform.TypeChecked;
@@ -43,7 +42,7 @@ class JournalProjectTest extends GroovyTestCase {
         case 'annual'    : 'YYYY';        break
         case 'shorter'   : 'dd-MMM-yyyy'; break
         case 'anchorDay' : 'yyyyMMdd'   ; break
-        case 'anchor.day': 
+        case 'anchor.day':
           logger.fatal regression63
           throw new Exception( regression63 )
         default:

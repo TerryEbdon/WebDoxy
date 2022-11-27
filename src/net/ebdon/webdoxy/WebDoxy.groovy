@@ -109,16 +109,16 @@ class WebDoxy {
     def options = cli.parse(args)
     logger.info "CliBuilder.arguments: ${options.arguments()}"
     if (options) {
-      logger.info "Working..."
+      logger.info 'Working...'
       def before = System.currentTimeMillis()
       WebDoxy build = new WebDoxy( options )
 
       if (options.help) {
-        println "\n"
+        println '\n'
         cli.usage()
         return
       }
-      
+
       build.initDoxygen()
 
       if ( options.create ) {

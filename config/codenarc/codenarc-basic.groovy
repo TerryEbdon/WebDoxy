@@ -109,7 +109,7 @@ ruleset {
     FieldTypeRequired
     HashtableIsObsolete
     IfStatementCouldBeTernary
-    InvertedCondition
+    // InvertedCondition
     // InvertedIfElse
     LongLiteralWithLowerCaseL
     MethodParameterTypeRequired
@@ -122,7 +122,7 @@ ruleset {
     StaticFieldsBeforeInstanceFields
     StaticMethodsBeforeInstanceMethods
     TernaryCouldBeElvis
-    // TrailingComma
+    TrailingComma
     VariableTypeRequired
     VectorIsObsolete
 

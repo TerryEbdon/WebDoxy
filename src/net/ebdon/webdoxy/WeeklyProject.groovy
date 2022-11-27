@@ -106,7 +106,7 @@ class WeeklyProject extends JournalProject {
   }
 
   @Override
-  def addPageToMonth( JournalPage weekPage, boolean subPage = true ) {
+  void addPageToMonth( JournalPage weekPage, boolean subPage = true ) {
     assert weekPage
     if ( buildConfig.project.journal.pages.monthly.required ) {
       logger.info '**** Monthly pages *ARE* required'

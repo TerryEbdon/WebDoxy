@@ -33,9 +33,10 @@ class MonthPage extends JournalPage {
     logger.debug 'MonthPage instantiated'
   }
 
-  def init() {
-    final SimpleDateFormat anchorFormat = project.dateFormatter( 'anchorMonth' ) ///@todo fix
-    final SimpleDateFormat titleformatter    = project.dateFormatter( 'month' ) ///@todo fix
+  @Override
+  void init() {
+    final SimpleDateFormat anchorFormat   = project.dateFormatter( 'anchorMonth' ) ///@todo fix
+    final SimpleDateFormat titleformatter = project.dateFormatter( 'month' ) ///@todo fix
 
     anchorDate = anchorFormat.format( pageDate )
     title      = titleformatter.format( pageDate )

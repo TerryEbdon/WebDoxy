@@ -36,8 +36,9 @@ class MonthSummaryPage extends JournalPage {
     logger.debug 'MonthSummaryPage instantiated'
   }
 
-  def init() {
-    final SimpleDateFormat anchorFormat = project.dateFormatter( 'anchorMonth' )
+  @Override
+  void init() {
+    final SimpleDateFormat anchorFormat   = project.dateFormatter( 'anchorMonth' )
     final SimpleDateFormat titleformatter = project.dateFormatter( 'month' )
 
     anchorDate = anchorFormat.format( pageDate )
@@ -122,7 +123,7 @@ class MonthSummaryPage extends JournalPage {
   }
 
   // @Override
-  // def getAnchorDate() {
+  // String getAnchorDate() {
   //   "${pageYear}-" + ( "${pageMonth}".padLeft(2,'0') )
   // }
 
