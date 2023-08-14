@@ -61,20 +61,24 @@ class WebDoxyTest extends GroovyTestCase {
     )
 
     resourceMock      = new MockFor( Resource )
-    configSlurperMock = new MockFor( ConfigSlurper )
     journalProjectMock = new MockFor( JournalProject )
 
-    configSlurperMock.demand.parse { final URL url ->
-      assert url.file ==~ '.*config.groovy$'
-      logger.debug 'configSlurperMock.demand.parse called'
-      config
-    }
-
+    resetConfigSlurper()
     resourceMock.demand.message { final String key, final Object[] args ->
       final String returnVal = "Resource.message() called with key $key & args $args"
       logger.info returnVal
       assert key == 'backup.copyDriveOffline'
       returnVal
+    }
+  }
+
+  void resetConfigSlurper() {
+    logger.debug 'Resetting config slurper'
+    configSlurperMock = new MockFor( ConfigSlurper )
+    configSlurperMock.demand.parse { final URL url ->
+      assert url.file ==~ '.*config.groovy$'
+      logger.debug 'configSlurperMock.demand.parse called'
+      config
     }
   }
 
@@ -179,5 +183,49 @@ class WebDoxyTest extends GroovyTestCase {
     logger.debug 'Start of testAddDiaryPageDefaultDate()'
     buildPages()
     logger.debug 'End of testAddDiaryPageDefaultDate()'
+  }
+
+  void testValidateMarkDownProject() {
+    logger.debug 'Start of validateMarkDownProject()'
+
+    [true,false].each { projectMissing ->
+      resetConfigSlurper()
+      final String projectName = theProjectName( projectMissing )
+      logger.debug projectName
+
+      MockFor projectMock = createProjectMock( projectMissing, projectName )
+      configSlurperMock.use {
+        projectMock.use {
+          try {
+            WebDoxy wd = new WebDoxy( options )
+            wd.metaClass.validateMarkDownProjectFiles { final Project project ->
+              logger.debug 'In stub for validateMarkDownProjectFiles()'
+              void
+            }
+            wd.validateMarkDownProject( projectName )
+          } catch ( Exception ex ) {
+            logger.debug '=' * 20
+            logger.debug ex.class.name
+            logger.debug ex.message
+            logger.debug '=' * 20
+            assert ex.message.contains( projectName )
+            assert projectMissing
+          }
+        }
+      }
+    }
+    logger.debug 'End of validateMarkDownProject()'
+  }
+
+  final theProjectName( final Boolean projectMissing ) {
+    ">>project that does${projectMissing ? ' not' : ''} exist<<";
+  }
+
+  final MockFor createProjectMock( final Boolean projectMissing, final String projectName ) {
+    logger.debug "** Testing with project.exists() returning ${!projectMissing}"
+    MockFor projectMock = new MockFor( Project )
+    projectMock.demand.getName(1) { projectName }
+    projectMock.demand.exists(1) { !projectMissing }
+    projectMock
   }
 }

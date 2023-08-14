@@ -416,6 +416,14 @@ class WebDoxy {
       )
     )
 
+    if ( project.exists() ) {
+      validateMarkDownProjectFiles( project )
+    } else {
+      ant.fail "Project $projectName not found"
+    }
+  }
+
+  void validateMarkDownProjectFiles( final Project project ) {
     ant.with {
       FileScanner scanner = fileScanner {
         fileset( dir: project.rootFolder ) {
